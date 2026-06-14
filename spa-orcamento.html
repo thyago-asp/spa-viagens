@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SPA Viagens – Solicitar Orçamento</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;1,400&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --black:  #0a0a0a;
+      --black2: #111111;
+      --black3: #1c1c1c;
+      --lime:   #CBFF00;
+      --lime-dk:#a8d400;
+      --white:  #ffffff;
+      --gray:   #666666;
+      --gray-lt:#999999;
+      --border: rgba(255,255,255,0.08);
+      --border-focus: rgba(203,255,0,0.5);
+      --red:    #ff4d4d;
+      --display:'Playfair Display', Georgia, serif;
+      --body:   'Montserrat', system-ui, sans-serif;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: var(--body);
+      font-weight: 300;
+      font-size: 15px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 2.5rem;
+      background: rgba(10,10,10,0.95);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(10px);
+    }
+    header img { height: 65px; width: auto; }
+    .header-back {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-size: 0.72rem; font-weight: 500; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--gray-lt); text-decoration: none;
+      transition: color 0.2s;
+    }
+    .header-back:hover { color: var(--lime); }
+    .header-back svg { transition: transform 0.2s; }
+    .header-back:hover svg { transform: translateX(-3px); }
+
+    /* ── LAYOUT ── */
+    .page-wrap {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      min-height: 100vh;
+      padding-top: 70px;
+    }
+
+    /* ── FORM SIDE ── */
+    .form-side {
+      padding: 3.5rem 3rem 5rem;
+      border-right: 1px solid rgba(203,255,0,0.08);
+      overflow-y: auto;
+      background: var(--black);
+    }
+
+    /* ── STEPS NAV ── */
+    .steps-nav {
+      display: flex; gap: 0.5rem; margin-bottom: 3rem;
+    }
+    .step-pill {
+      display: flex; align-items: center; gap: 0.5rem;
+      font-size: 0.68rem; font-weight: 600; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--gray); cursor: pointer;
+      transition: color 0.2s;
+      padding: 0.35rem 0.7rem;
+      border: 1px solid transparent;
+      border-radius: 2px;
+      user-select: none;
+    }
+    .step-pill .snum {
+      width: 22px; height: 22px;
+      border: 1px solid currentColor;
+      border-radius: 2px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.65rem; font-weight: 700;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .step-pill.active { color: var(--lime); border-color: rgba(203,255,0,0.2); }
+    .step-pill.active .snum { background: var(--lime); color: var(--black); border-color: var(--lime); }
+    .step-pill.done { color: var(--gray-lt); }
+    .step-pill.done .snum { background: var(--gray); color: var(--black); border-color: var(--gray); }
+
+    /* ── STEP PANEL ── */
+    .step-panel { display: none; }
+    .step-panel.active { display: block; animation: panelIn 0.35s ease; }
+    @keyframes panelIn { from { opacity:0; transform: translateX(14px); } to { opacity:1; transform:none; } }
+
+    .step-heading { margin-bottom: 2.5rem; }
+    .step-heading h2 {
+      font-family: var(--display);
+      font-size: clamp(1.8rem, 3vw, 2.4rem);
+      font-weight: 400; color: var(--white);
+      margin-bottom: 0.4rem;
+    }
+    .step-heading p {
+      font-size: 0.82rem; color: var(--gray-lt);
+      letter-spacing: 0.04em;
+    }
+
+    /* ── FIELDS ── */
+    .field-group { margin-bottom: 1.8rem; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem; }
+    .field-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.2rem; }
+
+    label {
+      display: block;
+      font-size: 0.68rem; font-weight: 600;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--gray-lt); margin-bottom: 0.6rem;
+    }
+    label .req { color: var(--lime); margin-left: 2px; }
+
+    input[type=text], input[type=email], input[type=tel],
+    input[type=date], input[type=number], textarea, select {
+      width: 100%; background: transparent;
+      border: none; border-bottom: 1px solid rgba(255,255,255,0.15);
+      color: var(--white); font-family: var(--body);
+      font-size: 0.95rem; font-weight: 400;
+      padding: 0.6rem 0; outline: none;
+      transition: border-color 0.25s;
+      border-radius: 0;
+      -webkit-appearance: none;
+    }
+    input[type=date]::-webkit-calendar-picker-indicator { filter: invert(1) brightness(0.4); cursor: pointer; }
+    input:focus, textarea:focus, select:focus { border-bottom-color: var(--lime); }
+    input.error, textarea.error { border-bottom-color: var(--red); }
+    .field-error { font-size: 0.7rem; color: var(--red); margin-top: 0.35rem; display: none; }
+    .field-error.show { display: block; }
+
+    select option { background: var(--black2); color: var(--white); }
+
+    textarea { resize: none; min-height: 80px; line-height: 1.6; }
+
+    /* Number spinners hidden */
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
+    input[type=number] { -moz-appearance: textfield; }
+
+    /* ── COUNTER FIELD ── */
+    .counter-wrap {
+      display: flex; align-items: center; gap: 0;
+      border-bottom: 1px solid rgba(255,255,255,0.15);
+      padding-bottom: 0.4rem;
+    }
+    .counter-btn {
+      width: 28px; height: 28px;
+      background: transparent; border: 1px solid rgba(255,255,255,0.15);
+      color: var(--white); cursor: pointer; font-size: 1rem;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 2px; transition: border-color 0.2s, color 0.2s;
+      user-select: none; flex-shrink: 0;
+    }
+    .counter-btn:hover { border-color: var(--lime); color: var(--lime); }
+    .counter-val {
+      flex: 1; text-align: center;
+      font-size: 0.95rem; font-weight: 500; color: var(--white);
+    }
+
+    /* ── TOGGLE (S/N) ── */
+    .toggle-wrap { display: flex; gap: 0.6rem; padding: 0.3rem 0; }
+    .toggle-opt {
+      flex: 1; padding: 0.65rem; text-align: center;
+      border: 1px solid rgba(255,255,255,0.12); border-radius: 2px;
+      font-size: 0.78rem; font-weight: 600; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--gray-lt);
+      cursor: pointer; transition: all 0.2s; user-select: none;
+    }
+    .toggle-opt:hover { border-color: rgba(203,255,0,0.3); color: var(--white); }
+    .toggle-opt.selected { background: var(--lime); color: var(--black); border-color: var(--lime); }
+
+    /* ── CHECKBOX CHIPS ── */
+    .chips-wrap { display: flex; flex-wrap: wrap; gap: 0.6rem; padding: 0.3rem 0; }
+    .chip {
+      padding: 0.5rem 1rem; border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 2px; font-size: 0.75rem; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--gray-lt); cursor: pointer; transition: all 0.2s;
+      user-select: none;
+    }
+    .chip:hover { border-color: rgba(203,255,0,0.3); color: var(--white); }
+    .chip.selected { background: rgba(203,255,0,0.1); color: var(--lime); border-color: rgba(203,255,0,0.4); }
+
+    /* ── DIVIDER ── */
+    .divider {
+      height: 1px; background: var(--border); margin: 2rem 0;
+    }
+
+    /* ── NAV BUTTONS ── */
+    .step-actions {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 3rem; padding-top: 2rem;
+      border-top: 1px solid var(--border);
+    }
+    .btn-back {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-size: 0.75rem; font-weight: 600; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--gray-lt);
+      background: transparent; border: none; cursor: pointer;
+      transition: color 0.2s; padding: 0;
+    }
+    .btn-back:hover { color: var(--white); }
+    .btn-next {
+      display: inline-flex; align-items: center; gap: 0.6rem;
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--black);
+      background: var(--lime); border: none; cursor: pointer;
+      padding: 0.9rem 2rem; border-radius: 2px;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-next:hover { background: var(--lime-dk); transform: translateY(-1px); }
+    .btn-submit {
+      background: var(--lime); color: var(--black);
+    }
+
+    /* ── SUCCESS ── */
+    .success-screen {
+      display: none;
+      text-align: center;
+      padding: 4rem 2rem;
+    }
+    .success-screen.show { display: block; animation: panelIn 0.4s ease; }
+    .success-icon {
+      width: 72px; height: 72px; border-radius: 50%;
+      background: var(--lime); color: var(--black);
+      font-size: 2rem; display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 2rem;
+    }
+    .success-screen h2 {
+      font-family: var(--display); font-size: 2rem;
+      color: var(--white); margin-bottom: 0.8rem;
+    }
+    .success-screen p { color: var(--gray-lt); max-width: 360px; margin: 0 auto; }
+
+    /* ── SUMMARY SIDE ── */
+    .summary-side {
+      padding: 3.5rem 2.5rem;
+      background: var(--black);
+      border-left: 1px solid rgba(203,255,0,0.08);
+      position: sticky; top: 70px; height: calc(100vh - 70px);
+      overflow-y: auto;
+    }
+    .summary-title {
+      font-size: 0.68rem; font-weight: 600; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--lime);
+      margin-bottom: 2rem;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .summary-title::before {
+      content: ''; display: block;
+      width: 16px; height: 1px; background: var(--lime);
+    }
+
+    .summary-block { margin-bottom: 2rem; }
+    .summary-block-label {
+      font-size: 0.65rem; font-weight: 600; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--gray);
+      margin-bottom: 0.8rem; padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .summary-row {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      gap: 0.5rem; padding: 0.5rem 0;
+    }
+    .summary-row + .summary-row { border-top: 1px solid rgba(255,255,255,0.04); }
+    .srow-key {
+      font-size: 0.75rem; color: var(--gray-lt); flex-shrink: 0;
+    }
+    .srow-val {
+      font-size: 0.82rem; font-weight: 500; color: var(--white);
+      text-align: right; word-break: break-word;
+    }
+    .srow-val.empty { color: var(--gray); font-weight: 300; font-style: italic; }
+
+    .summary-empty-msg {
+      font-size: 0.82rem; color: var(--gray); font-style: italic;
+      padding: 1rem 0;
+    }
+
+    /* Chips in summary */
+    .summary-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; justify-content: flex-end; }
+    .summary-chip {
+      font-size: 0.66rem; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; padding: 0.2rem 0.5rem;
+      border: 1px solid rgba(203,255,0,0.3); border-radius: 2px;
+      color: var(--lime);
+    }
+
+    /* Bottom CTA in summary */
+    .summary-cta {
+      margin-top: 2.5rem; padding-top: 2rem;
+      border-top: 1px solid var(--border);
+    }
+    .summary-cta p {
+      font-size: 0.78rem; color: var(--gray-lt); margin-bottom: 1rem; line-height: 1.6;
+    }
+    .summary-wa {
+      display: flex; align-items: center; gap: 0.6rem;
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--black);
+      background: var(--lime); text-decoration: none;
+      padding: 0.75rem 1.2rem; border-radius: 2px;
+      transition: background 0.2s;
+    }
+    .summary-wa:hover { background: var(--lime-dk); }
+
+    /* ── MOBILE ── */
+    @media (max-width: 900px) {
+      .page-wrap { grid-template-columns: 1fr; }
+      .summary-side { display: none; }
+      .form-side { padding: 2.5rem 1.5rem 5rem; border-right: none; }
+    }
+    @media (max-width: 480px) {
+      .field-row, .field-row-3 { grid-template-columns: 1fr; }
+      header { padding: 1rem 1.2rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <img src="img/logospa.png" alt="SPA Viagens"/>
+  <a href="spa-viagens.html" class="header-back">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    Voltar ao site
+  </a>
+</header>
+
+<div class="page-wrap">
+
+  <!-- FORM SIDE -->
+  <div class="form-side">
+
+    <!-- Steps nav -->
+    <div class="steps-nav" id="stepsNav">
+      <div class="step-pill active" data-step="1"><span class="snum">01</span> Dados</div>
+      <div class="step-pill" data-step="2"><span class="snum">02</span> Destino</div>
+      <div class="step-pill" data-step="3"><span class="snum">03</span> Passageiros</div>
+      <div class="step-pill" data-step="4"><span class="snum">04</span> Serviços</div>
+      <div class="step-pill" data-step="5"><span class="snum">05</span> Extras</div>
+    </div>
+
+    <!-- STEP 1: Dados Pessoais -->
+    <div class="step-panel active" id="step1">
+      <div class="step-heading">
+        <h2>Dados Pessoais</h2>
+        <p>Informações do solicitante</p>
+      </div>
+
+      <div class="field-group">
+        <label>Nome completo <span class="req">*</span></label>
+        <input type="text" id="campoNome" placeholder="Seu nome completo"/>
+        <div class="field-error" id="err-nome">Campo obrigatório</div>
+      </div>
+
+      <div class="field-group">
+        <label>Telefone / WhatsApp <span class="req">*</span></label>
+        <input type="tel" id="campoCelular" placeholder="+55 11 99988-7766"/>
+        <div class="field-error" id="err-celular">Informe um telefone válido (+PAIS DDD NUMERO)</div>
+      </div>
+
+      <div class="field-group">
+        <label>E-mail</label>
+        <input type="email" id="campoEmail" placeholder="seu@email.com"/>
+      </div>
+
+      <div class="field-group" style="margin-top:2rem;">
+        <label style="margin-bottom:1rem;">Posso entrar em contato por <span class="req">*</span></label>
+        <div class="toggle-wrap">
+          <div class="toggle-opt selected" data-field="campoAdicional_1" data-val="S">WhatsApp</div>
+          <div class="toggle-opt" data-field="campoAdicional_1" data-val="N">Apenas E-mail</div>
+        </div>
+        <input type="hidden" id="campoAdicional_1" value="S"/>
+      </div>
+
+      <div class="step-actions">
+        <span></span>
+        <button class="btn-next" onclick="goNext(1)">Próximo <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Destino -->
+    <div class="step-panel" id="step2">
+      <div class="step-heading">
+        <h2>Destino & Datas</h2>
+        <p>Para onde e quando você vai viajar?</p>
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label>Cidade de origem <span class="req">*</span></label>
+          <input type="text" id="campoOrigem" placeholder="Ex: São Paulo"/>
+          <div class="field-error" id="err-origem">Campo obrigatório</div>
+        </div>
+        <div class="field-group">
+          <label>Cidade de destino <span class="req">*</span></label>
+          <input type="text" id="campoDestino" placeholder="Ex: Lisboa"/>
+          <div class="field-error" id="err-destino">Campo obrigatório</div>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label>Data de ida <span class="req">*</span></label>
+          <input type="date" id="campoDataInicial"/>
+          <div class="field-error" id="err-data-ida">Campo obrigatório</div>
+        </div>
+        <div class="field-group">
+          <label>Data de volta</label>
+          <input type="date" id="campoDataFinal"/>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="field-group">
+        <label style="margin-bottom:1rem;">Flexibilidade de datas?</label>
+        <div class="toggle-wrap">
+          <div class="toggle-opt selected" data-field="campoFlexibilidade" data-val="S">Sim, tenho flexibilidade</div>
+          <div class="toggle-opt" data-field="campoFlexibilidade" data-val="N">Não, datas fixas</div>
+        </div>
+        <input type="hidden" id="campoFlexibilidade" value="S"/>
+      </div>
+
+      <div class="step-actions">
+        <button class="btn-back" onclick="goBack(2)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Voltar
+        </button>
+        <button class="btn-next" onclick="goNext(2)">Próximo <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Passageiros -->
+    <div class="step-panel" id="step3">
+      <div class="step-heading">
+        <h2>Passageiros</h2>
+        <p>Quantas pessoas vão viajar?</p>
+      </div>
+
+      <div class="field-row-3">
+        <div class="field-group">
+          <label>Adultos</label>
+          <div class="counter-wrap">
+            <button class="counter-btn" onclick="changeCounter('campoPassageiroAdulto', -1)">−</button>
+            <span class="counter-val" id="val-adulto">1</span>
+            <button class="counter-btn" onclick="changeCounter('campoPassageiroAdulto', 1)">+</button>
+          </div>
+          <input type="hidden" id="campoPassageiroAdulto" value="1"/>
+        </div>
+        <div class="field-group">
+          <label>Crianças <span style="font-size:.6rem;color:var(--gray)">(2-11 anos)</span></label>
+          <div class="counter-wrap">
+            <button class="counter-btn" onclick="changeCounter('campoPassageiroCrianca', -1)">−</button>
+            <span class="counter-val" id="val-crianca">0</span>
+            <button class="counter-btn" onclick="changeCounter('campoPassageiroCrianca', 1)">+</button>
+          </div>
+          <input type="hidden" id="campoPassageiroCrianca" value="0"/>
+        </div>
+        <div class="field-group">
+          <label>Bebês <span style="font-size:.6rem;color:var(--gray)">(até 2 anos)</span></label>
+          <div class="counter-wrap">
+            <button class="counter-btn" onclick="changeCounter('campoPassageiroBebe', -1)">−</button>
+            <span class="counter-val" id="val-bebe">0</span>
+            <button class="counter-btn" onclick="changeCounter('campoPassageiroBebe', 1)">+</button>
+          </div>
+          <input type="hidden" id="campoPassageiroBebe" value="0"/>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="field-group">
+        <label>Malas despachadas (total)</label>
+        <div class="counter-wrap" style="max-width:180px;">
+          <button class="counter-btn" onclick="changeCounter('campoMalaDespachada', -1)">−</button>
+          <span class="counter-val" id="val-mala">0</span>
+          <button class="counter-btn" onclick="changeCounter('campoMalaDespachada', 1)">+</button>
+        </div>
+        <input type="hidden" id="campoMalaDespachada" value="0"/>
+      </div>
+
+      <div class="step-actions">
+        <button class="btn-back" onclick="goBack(3)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Voltar
+        </button>
+        <button class="btn-next" onclick="goNext(3)">Próximo <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+      </div>
+    </div>
+
+    <!-- STEP 4: Serviços -->
+    <div class="step-panel" id="step4">
+      <div class="step-heading">
+        <h2>Serviços</h2>
+        <p>O que você precisa além do voo?</p>
+      </div>
+
+      <div class="field-group">
+        <label style="margin-bottom:1rem;">Serviços adicionais <span style="font-size:.65rem;color:var(--gray);font-weight:400;text-transform:none;letter-spacing:0">(selecione todos que quiser)</span></label>
+        <div class="chips-wrap">
+          <div class="chip" data-val="H">🏨 Hospedagem</div>
+          <div class="chip" data-val="T">🚗 Transporte / Transfer</div>
+          <div class="chip" data-val="P">🗺️ Passeios</div>
+          <div class="chip" data-val="S">🛡️ Seguro Viagem</div>
+          <div class="chip" data-val="C">🚢 Cruzeiro</div>
+          <div class="chip" data-val="R">📋 Roteiro Personalizado</div>
+        </div>
+        <input type="hidden" id="campoServicos" value="[]"/>
+      </div>
+
+      <div class="step-actions">
+        <button class="btn-back" onclick="goBack(4)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Voltar
+        </button>
+        <button class="btn-next" onclick="goNext(4)">Próximo <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+      </div>
+    </div>
+
+    <!-- STEP 5: Extras -->
+    <div class="step-panel" id="step5">
+      <div class="step-heading">
+        <h2>Finalizando</h2>
+        <p>Mais algum detalhe para a sua proposta?</p>
+      </div>
+
+      <div class="field-group">
+        <label>Cupom de desconto</label>
+        <input type="text" id="campoCupomDesconto" placeholder="Código do cupom"/>
+      </div>
+
+      <div class="field-group">
+        <label>Observações adicionais</label>
+        <textarea id="campoObservacao" placeholder="Preferências especiais, restrições alimentares, necessidades de acessibilidade, estilo de viagem..."></textarea>
+      </div>
+
+      <div class="step-actions">
+        <button class="btn-back" onclick="goBack(5)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Voltar
+        </button>
+        <button class="btn-next btn-submit" onclick="submitForm()">Enviar solicitação <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+      </div>
+    </div>
+
+    <!-- SUCCESS -->
+    <div class="success-screen" id="successScreen">
+      <div class="success-icon">✓</div>
+      <h2>Solicitação enviada!</h2>
+      <p>Nossa equipe vai analisar seu pedido e entrar em contato em breve com a melhor proposta para você.</p>
+      <div style="margin-top:2.5rem;">
+        <a href="https://wa.me/5500000000000" class="btn-next" style="display:inline-flex;text-decoration:none;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Falar no WhatsApp
+        </a>
+      </div>
+    </div>
+
+  </div><!-- /form-side -->
+
+  <!-- SUMMARY SIDE -->
+  <div class="summary-side">
+    <div class="summary-title">Resumo da viagem</div>
+
+    <!-- Solicitante -->
+    <div class="summary-block" id="sum-pessoa">
+      <div class="summary-block-label">Solicitante</div>
+      <div class="summary-row">
+        <span class="srow-key">Nome</span>
+        <span class="srow-val empty" id="s-nome">—</span>
+      </div>
+      <div class="summary-row">
+        <span class="srow-key">Telefone</span>
+        <span class="srow-val empty" id="s-celular">—</span>
+      </div>
+      <div class="summary-row">
+        <span class="srow-key">E-mail</span>
+        <span class="srow-val empty" id="s-email">—</span>
+      </div>
+      <div class="summary-row">
+        <span class="srow-key">Contato</span>
+        <span class="srow-val empty" id="s-contato">—</span>
+      </div>
+    </div>
+
+    <!-- Destino -->
+    <div class="summary-block" id="sum-destino">
+      <div class="summary-block-label">Destino & Datas</div>
+      <div class="summary-row">
+        <span class="srow-key">Origem</span>
+        <span class="srow-val empty" id="s-origem">—</span>
+      </div>
+      <div class="summary-row">
+        <span class="srow-key">Destino</span>
+        <span class="srow-val empty" id="s-destino">—</span>
+      </div>
+      <div class="summary-row">
+        <span class="srow-key">Ida</span>
+        <span class="srow-val empty" id="s-ida">—</span>
+      </div>
+      <div class="summary-row">
+        <span class="srow-key">Volta</span>
+        <span class="srow-val empty" id="s-volta">—</span>
+      </div>
+      <div class="summary-row">
+        <span class="srow-key">Flexibilidade</span>
+        <span class="srow-val empty" id="s-flex">—</span>
+      </div>
+    </div>
+
+    <!-- Passageiros -->
+    <div class="summary-block">
+      <div class="summary-block-label">Passageiros</div>
+      <div class="summary-row">
+        <span class="srow-key">Adultos</span>
+        <span class="srow-val" id="s-adultos">1</span>
+      </div>
+      <div class="summary-row">
+        <span class="srow-key">Crianças</span>
+        <span class="srow-val" id="s-criancas">0</span>
+      </div>
+      <div class="summary-row">
+        <span class="srow-key">Bebês</span>
+        <span class="srow-val" id="s-bebes">0</span>
+      </div>
+      <div class="summary-row">
+        <span class="srow-key">Malas</span>
+        <span class="srow-val" id="s-malas">0</span>
+      </div>
+    </div>
+
+    <!-- Serviços -->
+    <div class="summary-block">
+      <div class="summary-block-label">Serviços adicionais</div>
+      <div class="summary-row">
+        <div class="summary-chips" id="s-servicos">
+          <span class="srow-val empty" style="font-size:.75rem;">Nenhum selecionado</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Obs -->
+    <div class="summary-block" id="sum-obs" style="display:none">
+      <div class="summary-block-label">Observação</div>
+      <div class="summary-row">
+        <span class="srow-val" id="s-obs" style="font-size:.82rem;color:var(--gray-lt);text-align:left;"></span>
+      </div>
+    </div>
+
+    <div class="summary-cta">
+      <p>Prefere falar diretamente? Nossa equipe está pronta para atender.</p>
+      <a href="https://wa.me/5500000000000" target="_blank" class="summary-wa">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Falar pelo WhatsApp
+      </a>
+    </div>
+
+  </div><!-- /summary-side -->
+
+</div><!-- /page-wrap -->
+
+<script>
+  // ── STATE ──
+  let currentStep = 1;
+  const totalSteps = 5;
+
+  const serviceLabels = { H:'Hospedagem', T:'Transporte', P:'Passeios', S:'Seguro', C:'Cruzeiro', R:'Roteiro' };
+  let selectedServices = [];
+
+  // ── NAVIGATION ──
+  function goNext(step) {
+    if (!validateStep(step)) return;
+    updateSummary();
+    setStep(step + 1);
+  }
+  function goBack(step) {
+    setStep(step - 1);
+  }
+  function setStep(n) {
+    document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('step' + n).classList.add('active');
+    document.querySelectorAll('.step-pill').forEach(p => {
+      const s = parseInt(p.dataset.step);
+      p.classList.remove('active','done');
+      if (s === n) p.classList.add('active');
+      else if (s < n) p.classList.add('done');
+    });
+    currentStep = n;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ── VALIDATION ──
+  function validateStep(step) {
+    let ok = true;
+    if (step === 1) {
+      ok = req('campoNome','err-nome') && ok;
+      ok = reqPhone('campoCelular','err-celular') && ok;
+    }
+    if (step === 2) {
+      ok = req('campoOrigem','err-origem') && ok;
+      ok = req('campoDestino','err-destino') && ok;
+      ok = req('campoDataInicial','err-data-ida') && ok;
+    }
+    return ok;
+  }
+  function req(id, errId) {
+    const el = document.getElementById(id);
+    const err = document.getElementById(errId);
+    if (!el.value.trim()) {
+      el.classList.add('error'); err.classList.add('show'); return false;
+    }
+    el.classList.remove('error'); err.classList.remove('show'); return true;
+  }
+  function reqPhone(id, errId) {
+    const el = document.getElementById(id);
+    const err = document.getElementById(errId);
+    const v = el.value.trim();
+    if (!v) { el.classList.add('error'); err.classList.add('show'); return false; }
+    el.classList.remove('error'); err.classList.remove('show'); return true;
+  }
+
+  // ── LIVE SYNC ──
+  function syncField(inputId, summaryId, transform) {
+    const el = document.getElementById(inputId);
+    if (!el) return;
+    el.addEventListener('input', () => {
+      const s = document.getElementById(summaryId);
+      const v = transform ? transform(el.value) : el.value;
+      if (el.value.trim()) { s.textContent = v; s.classList.remove('empty'); }
+      else { s.textContent = '—'; s.classList.add('empty'); }
+    });
+  }
+
+  function formatDate(val) {
+    if (!val) return '—';
+    const [y,m,d] = val.split('-');
+    return d + '/' + m + '/' + y;
+  }
+
+  syncField('campoNome','s-nome');
+  syncField('campoCelular','s-celular');
+  syncField('campoEmail','s-email');
+  syncField('campoOrigem','s-origem');
+  syncField('campoDestino','s-destino');
+  syncField('campoDataInicial','s-ida', formatDate);
+  syncField('campoDataFinal','s-volta', formatDate);
+  syncField('campoObservacao','s-obs');
+
+  document.getElementById('campoObservacao').addEventListener('input', function() {
+    const b = document.getElementById('sum-obs');
+    b.style.display = this.value.trim() ? 'block' : 'none';
+  });
+
+  // ── TOGGLES ──
+  document.querySelectorAll('.toggle-opt').forEach(opt => {
+    opt.addEventListener('click', function() {
+      const field = this.dataset.field;
+      document.querySelectorAll('[data-field="' + field + '"]').forEach(o => o.classList.remove('selected'));
+      this.classList.add('selected');
+      document.getElementById(field).value = this.dataset.val;
+      // update summary
+      if (field === 'campoFlexibilidade') {
+        const s = document.getElementById('s-flex');
+        s.textContent = this.dataset.val === 'S' ? 'Sim' : 'Não';
+        s.classList.remove('empty');
+      }
+      if (field === 'campoAdicional_1') {
+        const s = document.getElementById('s-contato');
+        s.textContent = this.dataset.val === 'S' ? 'WhatsApp' : 'Apenas E-mail';
+        s.classList.remove('empty');
+      }
+    });
+  });
+  // init summary for defaults
+  document.getElementById('s-flex').textContent = 'Sim';
+  document.getElementById('s-flex').classList.remove('empty');
+  document.getElementById('s-contato').textContent = 'WhatsApp';
+  document.getElementById('s-contato').classList.remove('empty');
+
+  // ── COUNTERS ──
+  function changeCounter(id, delta) {
+    const hidden = document.getElementById(id);
+    let val = parseInt(hidden.value) + delta;
+    if (val < 0) val = 0;
+    hidden.value = val;
+    const map = { campoPassageiroAdulto:'val-adulto', campoPassageiroCrianca:'val-crianca', campoPassageiroBebe:'val-bebe', campoMalaDespachada:'val-mala' };
+    document.getElementById(map[id]).textContent = val;
+    // sync summary
+    const sumMap = { campoPassageiroAdulto:'s-adultos', campoPassageiroCrianca:'s-criancas', campoPassageiroBebe:'s-bebes', campoMalaDespachada:'s-malas' };
+    document.getElementById(sumMap[id]).textContent = val;
+  }
+
+  // ── CHIPS ──
+  document.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', function() {
+      this.classList.toggle('selected');
+      const val = this.dataset.val;
+      if (this.classList.contains('selected')) {
+        if (!selectedServices.includes(val)) selectedServices.push(val);
+      } else {
+        selectedServices = selectedServices.filter(v => v !== val);
+      }
+      document.getElementById('campoServicos').value = JSON.stringify(selectedServices);
+      updateServicosSum();
+    });
+  });
+
+  function updateServicosSum() {
+    const el = document.getElementById('s-servicos');
+    if (!selectedServices.length) {
+      el.innerHTML = '<span class="srow-val empty" style="font-size:.75rem;">Nenhum selecionado</span>';
+    } else {
+      el.innerHTML = selectedServices.map(v => '<span class="summary-chip">' + serviceLabels[v] + '</span>').join('');
+    }
+  }
+
+  // ── FULL SUMMARY ──
+  function updateSummary() {
+    // handled live
+  }
+
+  // ── SUBMIT ──
+  async function submitForm() {
+    if (!validateStep(5)) return;
+
+    const btnSubmit = document.querySelector('.btn-submit');
+    btnSubmit.disabled = true;
+    btnSubmit.innerHTML = 'Enviando... <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>';
+
+    const payload = {
+      campoNome:              document.getElementById('campoNome').value.trim(),
+      campoCelular:           document.getElementById('campoCelular').value.trim(),
+      campoEmail:             document.getElementById('campoEmail').value.trim(),
+      campoOrigem:            document.getElementById('campoOrigem').value.trim(),
+      campoDestino:           document.getElementById('campoDestino').value.trim(),
+      campoDataInicial:       document.getElementById('campoDataInicial').value,
+      campoDataFinal:         document.getElementById('campoDataFinal').value || null,
+      campoPassageiroAdulto:  parseInt(document.getElementById('campoPassageiroAdulto').value),
+      campoPassageiroCrianca: parseInt(document.getElementById('campoPassageiroCrianca').value),
+      campoPassageiroBebe:    parseInt(document.getElementById('campoPassageiroBebe').value),
+      campoFlexibilidade:     document.getElementById('campoFlexibilidade').value,
+      campoMalaDespachada:    parseInt(document.getElementById('campoMalaDespachada').value),
+      'campoServicos[]':      selectedServices,
+      campoCupomDesconto:     document.getElementById('campoCupomDesconto').value.trim() || null,
+      campoObservacao:        document.getElementById('campoObservacao').value.trim() || null,
+      campoAdicional_1:       document.getElementById('campoAdicional_1').value,
+    };
+
+    try {
+      const response = await fetch('https://agencia.iddas.com.br/so/iks58ver', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await response.json();
+
+      if (result.sucesso === 'S') {
+        // Sucesso — mostrar tela de confirmação com código
+        document.getElementById('codigoCotacao').textContent = result.cotacao || '';
+        document.getElementById('stepsNav').style.display = 'none';
+        document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+        document.getElementById('successScreen').classList.add('show');
+      } else {
+        // Erro retornado pela API
+        showApiError(result.msg || 'Erro ao realizar a solicitação. Tente novamente.');
+        btnSubmit.disabled = false;
+        btnSubmit.innerHTML = 'Enviar solicitação <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+      }
+    } catch (err) {
+      showApiError('Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.');
+      btnSubmit.disabled = false;
+      btnSubmit.innerHTML = 'Enviar solicitação <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+    }
+  }
+
+  function showApiError(msg) {
+    let el = document.getElementById('apiError');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'apiError';
+      el.style.cssText = 'margin-top:1rem;padding:0.9rem 1.2rem;background:rgba(255,77,77,0.1);border:1px solid rgba(255,77,77,0.3);border-radius:2px;font-size:0.85rem;color:#ff4d4d;';
+      document.querySelector('.step-actions').after(el);
+    }
+    el.textContent = '⚠️ ' + msg;
+    el.style.display = 'block';
+  }
+</script>
+</body>
+</html>

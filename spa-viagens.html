@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SPA Viagens – Concierge de Viagens</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black:   #0a0a0a;
+      --black2:  #111111;
+      --black3:  #1a1a1a;
+      --lime:    #CBFF00;
+      --lime-dk: #a8d400;
+      --white:   #ffffff;
+      --gray:    #888888;
+      --gray-lt: #cccccc;
+      --border:  rgba(203,255,0,0.15);
+
+      --display: 'Playfair Display', Georgia, serif;
+      --body:    'Montserrat', system-ui, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: var(--body);
+      font-weight: 300;
+      font-size: 16px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.2rem 5vw;
+      background: transparent;
+      transition: background 0.4s, box-shadow 0.4s;
+    }
+    nav.scrolled {
+      background: rgba(10,10,10,0.96);
+      box-shadow: 0 1px 0 rgba(203,255,0,0.12);
+      backdrop-filter: blur(10px);
+    }
+
+    .nav-logo img {
+      height: 70px;
+      width: auto;
+      display: block;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+    .nav-link {
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.6);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-link:hover { color: var(--lime); }
+
+    .nav-cta {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--black);
+      background: var(--lime);
+      text-decoration: none;
+      padding: 0.6rem 1.4rem;
+      border-radius: 2px;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .nav-cta:hover { background: var(--lime-dk); transform: translateY(-1px); }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+      padding: 0 5vw;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(105deg, rgba(10,10,10,0.92) 40%, rgba(10,10,10,0.55) 100%),
+        url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=1800&q=80') center/cover no-repeat;
+      animation: heroZoom 14s ease-out forwards;
+    }
+    @keyframes heroZoom {
+      from { transform: scale(1.05); }
+      to   { transform: scale(1.00); }
+    }
+
+    /* Lime glow accent */
+    .hero-glow {
+      position: absolute;
+      bottom: -20%;
+      right: -5%;
+      width: 55vw;
+      height: 55vw;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(203,255,0,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      max-width: 820px;
+      opacity: 0;
+      transform: translateY(28px);
+      animation: fadeUp 1s 0.5s forwards;
+    }
+    @keyframes fadeUp {
+      to { opacity: 1; transform: none; }
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--lime);
+      margin-bottom: 1.6rem;
+    }
+    .hero-eyebrow::before {
+      content: '';
+      display: block;
+      width: 28px;
+      height: 1px;
+      background: var(--lime);
+    }
+
+    .hero-title {
+      font-family: var(--display);
+      font-size: clamp(2.6rem, 6vw, 5rem);
+      font-weight: 400;
+      line-height: 1.1;
+      color: var(--white);
+      margin-bottom: 1.8rem;
+    }
+    .hero-title .accent { color: var(--lime); font-style: italic; }
+
+    .hero-sub {
+      font-size: 1rem;
+      font-weight: 300;
+      color: rgba(255,255,255,0.65);
+      max-width: 500px;
+      margin-bottom: 3rem;
+      line-height: 1.8;
+    }
+
+    .hero-slogan {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--lime);
+      border: 1px solid rgba(203,255,0,0.3);
+      padding: 0.4rem 0.9rem;
+      border-radius: 2px;
+      margin-bottom: 2.2rem;
+    }
+
+    .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+    .btn-primary {
+      display: inline-block;
+      font-family: var(--body);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--black);
+      background: var(--lime);
+      text-decoration: none;
+      padding: 1rem 2.2rem;
+      border-radius: 2px;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .btn-primary:hover { background: var(--lime-dk); transform: translateY(-2px); }
+
+    .btn-ghost {
+      display: inline-block;
+      font-family: var(--body);
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--white);
+      text-decoration: none;
+      padding: 1rem 2rem;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 2px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .btn-ghost:hover { border-color: var(--lime); color: var(--lime); background: rgba(203,255,0,0.04); }
+
+    /* hero stats */
+    .hero-stats {
+      position: absolute;
+      bottom: 3rem;
+      right: 5vw;
+      display: flex;
+      gap: 2.5rem;
+      opacity: 0;
+      animation: fadeUp 1s 1.2s forwards;
+    }
+    .stat-item { text-align: right; }
+    .stat-num {
+      font-family: var(--display);
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--lime);
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+      margin-top: 0.2rem;
+    }
+
+    /* ── SECTIONS ── */
+    section { padding: 6rem 5vw; }
+
+    .label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--lime);
+      margin-bottom: 1.4rem;
+    }
+    .label::before {
+      content: '';
+      display: block;
+      width: 20px;
+      height: 1px;
+      background: var(--lime);
+    }
+
+    .section-title {
+      font-family: var(--display);
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 400;
+      line-height: 1.15;
+      color: var(--white);
+      margin-bottom: 1.4rem;
+    }
+    .section-title .accent { color: var(--lime); font-style: italic; }
+    .section-title.dark { color: var(--black); }
+    .section-title.dark .accent { color: var(--black); text-decoration: underline; text-decoration-color: var(--lime); text-underline-offset: 6px; }
+
+    .section-lead {
+      font-size: 1rem;
+      font-weight: 300;
+      color: rgba(255,255,255,0.6);
+      max-width: 520px;
+      line-height: 1.85;
+    }
+    .section-lead.dark { color: rgba(10,10,10,0.6); }
+
+    /* ── PROMISE STRIP ── */
+    .promise-strip {
+      background: var(--lime);
+      padding: 2.5rem 5vw;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .promise-strip p {
+      font-family: var(--display);
+      font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+      font-weight: 400;
+      font-style: italic;
+      color: var(--black);
+      text-align: center;
+    }
+    .promise-strip a {
+      flex-shrink: 0;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--white);
+      background: var(--black);
+      text-decoration: none;
+      padding: 0.75rem 1.6rem;
+      border-radius: 2px;
+      white-space: nowrap;
+      transition: opacity 0.2s;
+    }
+    .promise-strip a:hover { opacity: 0.8; }
+
+    /* ── PILLARS ── */
+    .pillars { background: var(--black2); }
+    .pillars-inner { max-width: 1200px; margin: 0 auto; }
+    .pillars-header { margin-bottom: 3.5rem; }
+
+    .pillars-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1px;
+      background: rgba(203,255,0,0.08);
+    }
+
+    .pillar-card {
+      background: var(--black2);
+      padding: 2.8rem 2.2rem;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.3s;
+    }
+    .pillar-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--lime);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.4s;
+    }
+    .pillar-card:hover { background: var(--black3); }
+    .pillar-card:hover::before { transform: scaleX(1); }
+
+    .pillar-num {
+      font-family: var(--display);
+      font-size: 3rem;
+      font-weight: 700;
+      color: rgba(203,255,0,0.1);
+      line-height: 1;
+      margin-bottom: 1rem;
+    }
+    .pillar-title {
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      color: var(--white);
+      margin-bottom: 0.8rem;
+    }
+    .pillar-desc {
+      font-size: 0.88rem;
+      color: var(--gray);
+      line-height: 1.75;
+    }
+
+    /* ── JOURNEY ── */
+    .journey { background: var(--black); }
+    .journey-inner { max-width: 1200px; margin: 0 auto; }
+    .journey-header { margin-bottom: 4rem; }
+
+    .journey-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      position: relative;
+    }
+    .journey-grid::before {
+      content: '';
+      position: absolute;
+      top: 0.85rem;
+      left: 2rem;
+      right: 2rem;
+      height: 1px;
+      background: linear-gradient(to right, var(--lime), rgba(203,255,0,0.1));
+    }
+
+    .j-step { padding: 0 1.5rem 2rem; }
+    .j-dot {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      background: var(--lime);
+      margin-bottom: 1.8rem;
+      position: relative;
+    }
+    .j-dot::after {
+      content: '';
+      position: absolute;
+      inset: -5px;
+      border-radius: 50%;
+      border: 1px solid rgba(203,255,0,0.25);
+    }
+    .j-tag {
+      font-size: 0.66rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--lime);
+      margin-bottom: 0.5rem;
+    }
+    .j-title {
+      font-family: var(--display);
+      font-size: 1.15rem;
+      color: var(--white);
+      margin-bottom: 0.6rem;
+    }
+    .j-desc {
+      font-size: 0.85rem;
+      color: var(--gray);
+      line-height: 1.7;
+    }
+
+    /* ── MILES ── */
+    .miles { background: var(--lime); }
+    .miles .label { color: var(--black); }
+    .miles .label::before { background: var(--black); }
+    .miles-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5vw;
+      align-items: center;
+    }
+    .miles .section-title.dark { color: var(--black); }
+    .miles .section-lead.dark { color: rgba(0,0,0,0.65); }
+
+    .miles-highlight {
+      font-family: var(--display);
+      font-size: clamp(1.1rem, 2vw, 1.4rem);
+      font-style: italic;
+      color: var(--black);
+      border-left: 3px solid var(--black);
+      padding-left: 1.4rem;
+      margin-top: 2rem;
+    }
+
+    .miles-visual {
+      background: var(--black);
+      padding: 3rem;
+      border-radius: 2px;
+      text-align: center;
+    }
+    .miles-big {
+      font-family: var(--display);
+      font-size: clamp(3rem, 7vw, 6rem);
+      font-weight: 700;
+      color: var(--lime);
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+    .miles-caption {
+      font-size: 0.82rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+    }
+    .miles-divider {
+      width: 40px;
+      height: 1px;
+      background: rgba(203,255,0,0.3);
+      margin: 1.5rem auto;
+    }
+    .miles-sub {
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.45);
+      line-height: 1.7;
+    }
+    .spa-milhas-ref {
+      margin-top: 1.8rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(203,255,0,0.15);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .spa-milhas-ref img {
+      height: 48px;
+      width: auto;
+      opacity: 0.9;
+    }
+    .spa-milhas-ref span {
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+    }
+    .spa-milhas-ref a {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--lime);
+      text-decoration: none;
+      border: 1px solid rgba(203,255,0,0.35);
+      padding: 0.35rem 0.9rem;
+      border-radius: 2px;
+      transition: background 0.2s;
+    }
+    .spa-milhas-ref a:hover { background: rgba(203,255,0,0.08); }
+
+    /* ── TEAM ── */
+    .team { background: var(--black2); }
+    .team-inner { max-width: 1200px; margin: 0 auto; }
+    .team-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 3.5rem;
+    }
+    .team-card {
+      border: 1px solid rgba(203,255,0,0.12);
+      padding: 2.5rem;
+      border-radius: 2px;
+      transition: border-color 0.3s, background 0.3s;
+    }
+    .team-card:hover {
+      border-color: rgba(203,255,0,0.4);
+      background: rgba(203,255,0,0.02);
+    }
+    .team-initial {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: var(--lime);
+      color: var(--black);
+      font-family: var(--display);
+      font-size: 1.4rem;
+      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 1.4rem;
+    }
+    .team-name {
+      font-family: var(--display);
+      font-size: 1.3rem;
+      color: var(--white);
+      margin-bottom: 0.3rem;
+    }
+    .team-role {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--lime);
+      margin-bottom: 1rem;
+    }
+    .team-desc {
+      font-size: 0.9rem;
+      color: var(--gray);
+      line-height: 1.75;
+    }
+
+    .team-photo-wrap {
+      margin-top: 3rem;
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+      max-height: 520px;
+    }
+    .team-photo-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      display: block;
+    }
+    .team-photo-names {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      background: linear-gradient(transparent, rgba(10,10,10,0.85));
+      display: flex;
+      justify-content: space-between;
+      padding: 2rem 2.5rem 1.5rem;
+    }
+    .team-photo-name {
+      font-family: var(--display);
+      font-size: 1.1rem;
+      color: var(--white);
+    }
+    .team-photo-name span {
+      display: block;
+      font-family: var(--body);
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--lime);
+      margin-top: 0.2rem;
+    }
+
+    /* ── CTA ── */
+    .cta-section {
+      background: var(--black);
+      padding: 7rem 5vw;
+      text-align: center;
+      border-top: 1px solid rgba(203,255,0,0.1);
+    }
+    .cta-section .section-lead {
+      margin: 0 auto 3rem;
+      max-width: 480px;
+    }
+
+    .cta-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+    .btn-wa {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-family: var(--body);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--black);
+      background: var(--lime);
+      text-decoration: none;
+      padding: 1rem 2rem;
+      border-radius: 2px;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .btn-wa:hover { background: var(--lime-dk); transform: translateY(-2px); }
+
+    .btn-ig {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-family: var(--body);
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--white);
+      text-decoration: none;
+      padding: 1rem 2rem;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 2px;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-ig:hover { border-color: var(--lime); color: var(--lime); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: #050505;
+      padding: 2rem 5vw;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    .footer-logo img { height: 55px; width: auto; opacity: 0.7; }
+    .footer-tagline {
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.25);
+      letter-spacing: 0.08em;
+    }
+    .footer-slogan {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(203,255,0,0.4);
+    }
+
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .miles-inner, .team-grid { grid-template-columns: 1fr; }
+      .journey-grid { grid-template-columns: 1fr 1fr; }
+      .journey-grid::before { display: none; }
+      .hero-stats { display: none; }
+      footer { justify-content: center; text-align: center; }
+    }
+    @media (max-width: 480px) {
+      .journey-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#inicio" class="nav-logo">
+    <img src="img/logospa.png" alt="SPA Viagens" />
+  </a>
+  <div class="nav-links">
+    <a href="#servicos" class="nav-link">Serviços</a>
+    <a href="#jornada" class="nav-link">Como funciona</a>
+    <a href="#equipe" class="nav-link">Equipe</a>
+  </div>
+  <a href="spa-orcamento.html" class="nav-cta">Solicitar orçamento</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="inicio">
+  <div class="hero-bg"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">Concierge de Viagens</p>
+    <div class="hero-slogan">Sonhe · Planeje · Aja</div>
+    <h1 class="hero-title">
+      A única preocupação é<br>
+      <span class="accent">chegar no horário</span><br>
+      ao aeroporto.
+    </h1>
+    <p class="hero-sub">Do planejamento ao retorno, nossa equipe cuida de cada detalhe para que você aproveite o que realmente importa — a viagem.</p>
+    <div class="hero-actions">
+      <a href="spa-orcamento.html" class="btn-primary">Solicitar orçamento</a>
+      <a href="#servicos" class="btn-ghost">Como funcionamos</a>
+    </div>
+  </div>
+  <div class="hero-stats">
+    <div class="stat-item">
+      <div class="stat-num">24h</div>
+      <div class="stat-label">Suporte ativo</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">100%</div>
+      <div class="stat-label">Dedicação</div>
+    </div>
+  </div>
+</section>
+
+<!-- PROMISE STRIP -->
+<div class="promise-strip">
+  <p>"Transformando sonhos em realizações — do orçamento ao retorno para casa."</p>
+  <a href="spa-orcamento.html">Quero viajar assim</a>
+</div>
+
+<!-- PILLARS -->
+<section class="pillars" id="servicos">
+  <div class="pillars-inner">
+    <div class="pillars-header">
+      <p class="label">Por que a SPA Viagens</p>
+      <h2 class="section-title">Quatro diferenciais que<br>mudam a sua <span class="accent">experiência</span></h2>
+    </div>
+    <div class="pillars-grid">
+      <div class="pillar-card">
+        <div class="pillar-num">01</div>
+        <h3 class="pillar-title">Concierge Completo</h3>
+        <p class="pillar-desc">Acompanhamos cada etapa da sua jornada — da primeira pesquisa ao check-in de volta — com atenção personalizada e dedicação total ao seu conforto.</p>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-num">02</div>
+        <h3 class="pillar-title">Expertise em Milhas</h3>
+        <p class="pillar-desc">Identificamos oportunidades que o viajante comum não enxerga. Frequentemente entregamos mais conforto pelo mesmo valor — ou até menos do que fazer sozinho.</p>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-num">03</div>
+        <h3 class="pillar-title">Atendimento Humanizado</h3>
+        <p class="pillar-desc">Você conversa com pessoas reais que conhecem seu nome e os detalhes da sua viagem. Sem bots, sem protocolos frios, sem espera desnecessária.</p>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-num">04</div>
+        <h3 class="pillar-title">Suporte 24 horas</h3>
+        <p class="pillar-desc">Imprevistos acontecem. Quando acontecem, você não está sozinho. Estamos disponíveis para resolver qualquer situação, onde quer que você esteja.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- JOURNEY -->
+<section class="journey" id="jornada">
+  <div class="journey-inner">
+    <div class="journey-header">
+      <p class="label">Do começo ao fim</p>
+      <h2 class="section-title">Uma jornada cuidada<br>em cada <span class="accent">detalhe</span></h2>
+    </div>
+    <div class="journey-grid">
+      <div class="j-step">
+        <div class="j-dot"></div>
+        <p class="j-tag">Antes</p>
+        <h3 class="j-title">Planejamento</h3>
+        <p class="j-desc">Pesquisa, cotações personalizadas, documentação, seguro, hotéis, voos, transfer, passeios e roteiro completo.</p>
+      </div>
+      <div class="j-step">
+        <div class="j-dot"></div>
+        <p class="j-tag">Pré-embarque</p>
+        <h3 class="j-title">Preparação</h3>
+        <p class="j-desc">Check-in antecipado, envio dos cartões de embarque, orientações finais e monitoramento do voo.</p>
+      </div>
+      <div class="j-step">
+        <div class="j-dot"></div>
+        <p class="j-tag">Durante</p>
+        <h3 class="j-title">Suporte ativo</h3>
+        <p class="j-desc">Disponíveis para alterações, imprevistos e orientações. Você viaja; nós cuidamos do que for preciso.</p>
+      </div>
+      <div class="j-step">
+        <div class="j-dot"></div>
+        <p class="j-tag">Retorno</p>
+        <h3 class="j-title">Até a chegada</h3>
+        <p class="j-desc">Check-in da volta, cartões de embarque e acompanhamento até o encerramento completo da sua viagem.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MILES -->
+<section class="miles">
+  <div class="miles-inner">
+    <div>
+      <p class="label">Diferencial exclusivo</p>
+      <h2 class="section-title dark">Especialistas em<br><span style="font-style:italic;text-decoration:underline;text-decoration-color:#000;text-underline-offset:6px;">milhas aéreas</span></h2>
+      <p class="section-lead dark">Como somos especialistas em milhas, frequentemente encontramos oportunidades que o cliente comum não consegue enxergar.</p>
+      <p class="miles-highlight">"Entregamos toda a comodidade de um serviço concierge — e na maioria das vezes, pelo mesmo valor ou até menos do que organizar tudo sozinho."</p>
+    </div>
+    <div class="miles-visual">
+      <div class="miles-big">✈ Milhas</div>
+      <div class="miles-divider"></div>
+      <p class="miles-caption">Economia inteligente</p>
+      <div class="miles-divider"></div>
+      <p class="miles-sub">Combinamos expertise técnica em milhas com atendimento concierge para entregar mais por menos.</p>
+      <div class="spa-milhas-ref">
+        <img src="img/logospamilhas.png" alt="SPA Milhas" />
+        <span>Parte do nosso ecossistema</span>
+        <a href="#" title="Conheça a SPA Milhas">Conheça a mentoria →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section class="team" id="equipe">
+  <div class="team-inner">
+    <p class="label">A equipe</p>
+    <h2 class="section-title">Pessoas reais cuidando<br>da <span class="accent">sua</span> viagem</h2>
+    <div class="team-photo-wrap">
+      <img src="img/socios.png" alt="Jean Henning e Thyago Pereira — Sócios SPA Viagens" />
+      <div class="team-photo-names">
+        <div class="team-photo-name">Jean Henning<span>Sócio · Operações & Milhas</span></div>
+        <div class="team-photo-name" style="text-align:right">Thyago Pereira<span>Sócio · Estratégia & Milhas</span></div>
+      </div>
+    </div>
+    <div class="team-grid">
+      <div class="team-card">
+        <div class="team-initial">J</div>
+        <h3 class="team-name">Jean Carlo Henning</h3>
+        <p class="team-role">Sócio · Operações & Atendimento</p>
+        <p class="team-desc">Especialista técnico por trás das cotações, emissões e da execução impecável de cada reserva. É quem transforma as melhores oportunidades em milhas em viagens reais para nossos clientes.</p>
+      </div>
+      <div class="team-card">
+        <div class="team-initial">T</div>
+        <h3 class="team-name">Thyago Pereira</h3>
+        <p class="team-role">Sócio · Estratégia & Milhas</p>
+        <p class="team-desc">Fundador da SPA Viagens e da SPA Milhas. Responsável pela estratégia comercial, gestão financeira e pela expertise técnica em milhas aéreas. É quem garante que cada cliente encontre as melhores oportunidades e que o negócio evolua com consistência.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="contato">
+  <p class="label" style="justify-content:center;">Pronto para viajar?</p>
+  <h2 class="section-title">Solicite seu orçamento<br><span class="accent">sem compromisso</span></h2>
+  <p class="section-lead">Conta seu destino, as datas e o que precisa. Em poucas horas você recebe uma proposta personalizada, cuidada em cada detalhe.</p>
+  <div class="cta-buttons">
+    <a href="spa-orcamento.html" class="btn-wa">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      WhatsApp
+    </a>
+    <a href="https://instagram.com/spaviagens" target="_blank" class="btn-ig">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+      Instagram
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">
+    <img src="img/logospa.png" alt="SPA Viagens" />
+  </div>
+  <span class="footer-tagline">Da cotação ao retorno, cuidamos de cada detalhe.</span>
+  <span class="footer-slogan">Sonhe · Planeje · Aja</span>
+</footer>
+
+<script>
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 60);
+  }, { passive: true });
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.pillar-card, .j-step, .team-card, .miles-visual, .miles-highlight').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(18px)';
+    el.style.transition = 'opacity 0.65s ease, transform 0.65s ease';
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>

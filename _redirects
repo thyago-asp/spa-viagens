@@ -1,1 +1,2 @@
 /api/orcamento https://agencia.iddas.com.br/so/iks58ver 200
+/api/cnpj-pesquisa /.netlify/functions/cnpj-pesquisa 200

@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SPA Viagens – Consulta de CNPJ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;1,400&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --black:  #0a0a0a;
+      --black2: #111111;
+      --black3: #1c1c1c;
+      --lime:   #CBFF00;
+      --lime-dk:#a8d400;
+      --white:  #ffffff;
+      --gray:   #666666;
+      --gray-lt:#999999;
+      --border: rgba(255,255,255,0.08);
+      --red:    #ff4d4d;
+      --display:'Playfair Display', Georgia, serif;
+      --body:   'Montserrat', system-ui, sans-serif;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: var(--body);
+      font-weight: 300;
+      font-size: 15px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 2.5rem;
+      background: rgba(10,10,10,0.95);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(10px);
+    }
+    header img { height: 65px; width: auto; }
+    .header-back {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-size: 0.72rem; font-weight: 500; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--gray-lt); text-decoration: none;
+      transition: color 0.2s;
+    }
+    .header-back:hover { color: var(--lime); }
+    .header-back svg { transition: transform 0.2s; }
+    .header-back:hover svg { transform: translateX(-3px); }
+
+    /* ── LAYOUT ── */
+    .page-wrap {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 110px 2rem 5rem;
+    }
+
+    /* ── PAGE HEADING ── */
+    .page-heading { margin-bottom: 3rem; }
+    .page-heading .label {
+      font-size: 0.68rem; font-weight: 600; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--lime);
+      display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.8rem;
+    }
+    .page-heading .label::before {
+      content: ''; display: block; width: 16px; height: 1px; background: var(--lime);
+    }
+    .page-heading h1 {
+      font-family: var(--display);
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 400; color: var(--white);
+      margin-bottom: 0.5rem;
+    }
+    .page-heading p { font-size: 0.85rem; color: var(--gray-lt); }
+
+    /* ── SEARCH BOX ── */
+    .search-box {
+      display: flex; gap: 0.8rem; align-items: flex-end;
+      margin-bottom: 2.5rem;
+    }
+    .search-field { flex: 1; }
+    .search-field label {
+      display: block;
+      font-size: 0.68rem; font-weight: 600;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--gray-lt); margin-bottom: 0.6rem;
+    }
+    .search-field input {
+      width: 100%; background: transparent;
+      border: none; border-bottom: 1px solid rgba(255,255,255,0.18);
+      color: var(--white); font-family: var(--body);
+      font-size: 1.05rem; font-weight: 400;
+      padding: 0.6rem 0; outline: none;
+      transition: border-color 0.25s;
+      letter-spacing: 0.06em;
+    }
+    .search-field input:focus { border-bottom-color: var(--lime); }
+    .search-field input.error { border-bottom-color: var(--red); }
+    .field-error {
+      font-size: 0.7rem; color: var(--red); margin-top: 0.35rem; display: none;
+    }
+    .field-error.show { display: block; }
+
+    .btn-search {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--black);
+      background: var(--lime); border: none; cursor: pointer;
+      padding: 0.9rem 1.8rem; border-radius: 2px;
+      transition: background 0.2s, transform 0.15s;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .btn-search:hover { background: var(--lime-dk); transform: translateY(-1px); }
+    .btn-search:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    /* ── STATES ── */
+    .state-msg {
+      text-align: center; padding: 3rem 0; color: var(--gray-lt);
+      font-size: 0.88rem; display: none;
+    }
+    .state-msg.show { display: block; }
+    .state-msg .icon { font-size: 2.5rem; margin-bottom: 1rem; display: block; }
+
+    .error-msg {
+      padding: 0.9rem 1.2rem;
+      background: rgba(255,77,77,0.1);
+      border: 1px solid rgba(255,77,77,0.3);
+      border-radius: 2px; font-size: 0.85rem; color: var(--red);
+      margin-bottom: 2rem; display: none;
+    }
+    .error-msg.show { display: block; }
+
+    /* ── RESULT CARD ── */
+    .result-card {
+      border: 1px solid rgba(203,255,0,0.12);
+      border-radius: 4px;
+      background: var(--black2);
+      display: none;
+    }
+    .result-card.show { display: block; animation: fadeIn 0.35s ease; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+
+    .card-header {
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem;
+    }
+    .card-header-left { flex: 1; }
+    .company-name {
+      font-family: var(--display);
+      font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+      font-weight: 400; color: var(--white);
+      margin-bottom: 0.3rem;
+    }
+    .fantasy-name { font-size: 0.82rem; color: var(--gray-lt); }
+
+    .badge {
+      display: inline-flex; align-items: center;
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; padding: 0.3rem 0.7rem;
+      border-radius: 2px; flex-shrink: 0;
+    }
+    .badge-active { background: rgba(203,255,0,0.15); color: var(--lime); border: 1px solid rgba(203,255,0,0.3); }
+    .badge-inactive { background: rgba(255,77,77,0.12); color: var(--red); border: 1px solid rgba(255,77,77,0.3); }
+    .badge-other { background: rgba(255,255,255,0.07); color: var(--gray-lt); border: 1px solid var(--border); }
+
+    .card-body { padding: 1.5rem 2rem; }
+
+    .section-label {
+      font-size: 0.65rem; font-weight: 600; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--gray);
+      margin-bottom: 1rem; padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .info-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 0.2rem; margin-bottom: 2rem;
+    }
+    .info-row {
+      display: flex; flex-direction: column;
+      padding: 0.7rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .info-row.full { grid-column: 1 / -1; }
+    .info-key {
+      font-size: 0.65rem; font-weight: 600; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--gray); margin-bottom: 0.2rem;
+    }
+    .info-val {
+      font-size: 0.88rem; color: var(--white); font-weight: 400;
+    }
+    .info-val.empty { color: var(--gray); font-style: italic; }
+
+    /* Sócios */
+    .socios-list { display: flex; flex-direction: column; gap: 0.6rem; }
+    .socio-item {
+      padding: 0.8rem 1rem;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+    }
+    .socio-nome { font-size: 0.88rem; font-weight: 500; color: var(--white); }
+    .socio-meta { font-size: 0.72rem; color: var(--gray-lt); margin-top: 0.2rem; }
+
+    /* CNAEs */
+    .cnae-principal {
+      padding: 0.8rem 1rem;
+      background: rgba(203,255,0,0.05);
+      border: 1px solid rgba(203,255,0,0.15);
+      border-radius: 2px; margin-bottom: 0.6rem;
+    }
+    .cnae-code { font-size: 0.7rem; color: var(--lime); font-weight: 600; margin-bottom: 0.2rem; }
+    .cnae-desc { font-size: 0.85rem; color: var(--white); }
+    .cnaes-secundarios { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .cnae-chip {
+      font-size: 0.68rem; padding: 0.3rem 0.6rem;
+      border: 1px solid var(--border); border-radius: 2px;
+      color: var(--gray-lt);
+    }
+    .cnae-chip span { color: var(--gray); margin-right: 0.3rem; }
+
+    /* ── MOBILE ── */
+    @media (max-width: 600px) {
+      header { padding: 1rem 1.2rem; }
+      .page-wrap { padding: 100px 1.2rem 4rem; }
+      .search-box { flex-direction: column; align-items: stretch; }
+      .btn-search { width: 100%; justify-content: center; }
+      .info-grid { grid-template-columns: 1fr; }
+      .card-header { flex-direction: column; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <img src="img/logospa.png" alt="SPA Viagens"/>
+  <a href="spa-viagens.html" class="header-back">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    Voltar ao site
+  </a>
+</header>
+
+<div class="page-wrap">
+
+  <div class="page-heading">
+    <div class="label">Ferramentas</div>
+    <h1>Consulta de CNPJ</h1>
+    <p>Pesquise dados cadastrais de empresas brasileiras via Casa dos Dados.</p>
+  </div>
+
+  <!-- BUSCA -->
+  <div class="search-box">
+    <div class="search-field">
+      <label for="inputCnpj">CNPJ</label>
+      <input
+        type="text"
+        id="inputCnpj"
+        placeholder="00.000.000/0000-00"
+        maxlength="18"
+        autocomplete="off"
+        inputmode="numeric"
+      />
+      <div class="field-error" id="errCnpj">Informe um CNPJ válido com 14 dígitos.</div>
+    </div>
+    <button class="btn-search" id="btnSearch" onclick="buscarCnpj()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      Consultar
+    </button>
+  </div>
+
+  <div class="error-msg" id="errorMsg"></div>
+
+  <!-- ESTADO VAZIO -->
+  <div class="state-msg show" id="stateEmpty">
+    <span class="icon">🏢</span>
+    Digite o CNPJ acima e clique em <strong>Consultar</strong> para ver os dados da empresa.
+  </div>
+
+  <!-- ESTADO LOADING -->
+  <div class="state-msg" id="stateLoading">
+    <span class="icon">⏳</span>
+    Consultando Casa dos Dados…
+  </div>
+
+  <!-- RESULTADO -->
+  <div class="result-card" id="resultCard">
+
+    <div class="card-header">
+      <div class="card-header-left">
+        <div class="company-name" id="rRazao">—</div>
+        <div class="fantasy-name" id="rFantasia"></div>
+      </div>
+      <span class="badge" id="rSituacaoBadge"></span>
+    </div>
+
+    <div class="card-body">
+
+      <!-- Identificação -->
+      <div class="section-label">Identificação</div>
+      <div class="info-grid">
+        <div class="info-row">
+          <span class="info-key">CNPJ</span>
+          <span class="info-val" id="rCnpj">—</span>
+        </div>
+        <div class="info-row">
+          <span class="info-key">Porte</span>
+          <span class="info-val" id="rPorte">—</span>
+        </div>
+        <div class="info-row">
+          <span class="info-key">Natureza Jurídica</span>
+          <span class="info-val" id="rNatureza">—</span>
+        </div>
+        <div class="info-row">
+          <span class="info-key">Capital Social</span>
+          <span class="info-val" id="rCapital">—</span>
+        </div>
+        <div class="info-row">
+          <span class="info-key">Abertura</span>
+          <span class="info-val" id="rAbertura">—</span>
+        </div>
+        <div class="info-row">
+          <span class="info-key">Situação Cadastral</span>
+          <span class="info-val" id="rSituacao">—</span>
+        </div>
+        <div class="info-row">
+          <span class="info-key">Optante MEI</span>
+          <span class="info-val" id="rMei">—</span>
+        </div>
+        <div class="info-row">
+          <span class="info-key">Simples Nacional</span>
+          <span class="info-val" id="rSimples">—</span>
+        </div>
+      </div>
+
+      <!-- Endereço -->
+      <div class="section-label">Endereço</div>
+      <div class="info-grid">
+        <div class="info-row full">
+          <span class="info-key">Logradouro</span>
+          <span class="info-val" id="rEndereco">—</span>
+        </div>
+        <div class="info-row">
+          <span class="info-key">Município / UF</span>
+          <span class="info-val" id="rCidade">—</span>
+        </div>
+        <div class="info-row">
+          <span class="info-key">CEP</span>
+          <span class="info-val" id="rCep">—</span>
+        </div>
+      </div>
+
+      <!-- Contato -->
+      <div class="section-label">Contato</div>
+      <div class="info-grid">
+        <div class="info-row">
+          <span class="info-key">Telefone</span>
+          <span class="info-val" id="rTelefone">—</span>
+        </div>
+        <div class="info-row">
+          <span class="info-key">E-mail</span>
+          <span class="info-val" id="rEmail">—</span>
+        </div>
+      </div>
+
+      <!-- CNAE -->
+      <div class="section-label">Atividade Econômica</div>
+      <div id="rCnaePrincipalWrap" style="margin-bottom:1.2rem;"></div>
+      <div class="cnaes-secundarios" id="rCnaesSecWrap"></div>
+
+      <!-- Sócios -->
+      <div id="sociosSection" style="margin-top:2rem;display:none;">
+        <div class="section-label">Quadro Societário</div>
+        <div class="socios-list" id="rSocios"></div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ── MASK ──
+  document.getElementById('inputCnpj').addEventListener('input', function () {
+    let v = this.value.replace(/\D/g, '').slice(0, 14);
+    if (v.length > 12) v = v.slice(0,2)+'.'+v.slice(2,5)+'.'+v.slice(5,8)+'/'+v.slice(8,12)+'-'+v.slice(12);
+    else if (v.length > 8) v = v.slice(0,2)+'.'+v.slice(2,5)+'.'+v.slice(5,8)+'/'+v.slice(8);
+    else if (v.length > 5) v = v.slice(0,2)+'.'+v.slice(2,5)+'.'+v.slice(5);
+    else if (v.length > 2) v = v.slice(0,2)+'.'+v.slice(2);
+    this.value = v;
+  });
+
+  document.getElementById('inputCnpj').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') buscarCnpj();
+  });
+
+  // ── HELPERS ──
+  function fmt(v) { return v || null; }
+  function money(v) {
+    if (v == null) return null;
+    return 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+  }
+  function date(v) {
+    if (!v) return null;
+    const d = new Date(v);
+    if (isNaN(d)) return v;
+    return d.toLocaleDateString('pt-BR');
+  }
+  function set(id, val, fallback) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const display = fmt(val) || fallback || null;
+    el.textContent = display || '—';
+    el.classList.toggle('empty', !display);
+  }
+  function situacaoBadge(situacao) {
+    const s = (situacao || '').toLowerCase();
+    if (s.includes('ativa')) return ['badge-active', situacao];
+    if (s.includes('baixada') || s.includes('inapta') || s.includes('cancelada')) return ['badge-inactive', situacao];
+    return ['badge-other', situacao || '—'];
+  }
+
+  // ── BUSCA ──
+  async function buscarCnpj() {
+    const input = document.getElementById('inputCnpj');
+    const err = document.getElementById('errCnpj');
+    const cnpj = input.value.replace(/\D/g, '');
+
+    // validação básica
+    if (!cnpj || cnpj.length !== 14) {
+      input.classList.add('error');
+      err.classList.add('show');
+      return;
+    }
+    input.classList.remove('error');
+    err.classList.remove('show');
+
+    // estados
+    setState('loading');
+    document.getElementById('errorMsg').classList.remove('show');
+    document.getElementById('btnSearch').disabled = true;
+
+    try {
+      const resp = await fetch('/api/cnpj-pesquisa', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cnpj }),
+      });
+
+      const data = await resp.json();
+
+      if (!resp.ok) {
+        showError(data.erro || data.message || 'Erro ao consultar. Verifique o CNPJ e tente novamente.');
+        setState('empty');
+        return;
+      }
+
+      renderResult(data);
+      setState('result');
+
+    } catch {
+      showError('Não foi possível conectar ao servidor. Verifique sua conexão.');
+      setState('empty');
+    } finally {
+      document.getElementById('btnSearch').disabled = false;
+    }
+  }
+
+  function setState(s) {
+    document.getElementById('stateEmpty').classList.toggle('show', s === 'empty');
+    document.getElementById('stateLoading').classList.toggle('show', s === 'loading');
+    document.getElementById('resultCard').classList.toggle('show', s === 'result');
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('errorMsg');
+    el.textContent = '⚠️ ' + msg;
+    el.classList.add('show');
+  }
+
+  function renderResult(data) {
+    // A Casa dos Dados retorna um array em data ou data.data
+    const list = Array.isArray(data) ? data : (data.data || [data]);
+    const e = list[0] || data;
+
+    // Razão social e fantasia
+    document.getElementById('rRazao').textContent = e.razao_social || e.nome || '—';
+    const fantEl = document.getElementById('rFantasia');
+    fantEl.textContent = e.nome_fantasia ? 'Nome fantasia: ' + e.nome_fantasia : '';
+    fantEl.style.display = e.nome_fantasia ? 'block' : 'none';
+
+    // Situação badge
+    const sit = e.situacao_cadastral || e.situacao || '';
+    const [cls, label] = situacaoBadge(sit);
+    const badge = document.getElementById('rSituacaoBadge');
+    badge.className = 'badge ' + cls;
+    badge.textContent = label;
+
+    // Identificação
+    set('rCnpj', e.cnpj ? e.cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5') : null);
+    set('rPorte', e.porte || e.porte_empresa);
+    set('rNatureza', e.natureza_juridica);
+    set('rCapital', money(e.capital_social));
+    set('rAbertura', date(e.data_abertura || e.data_inicio_atividade));
+    set('rSituacao', sit);
+    set('rMei', e.mei != null ? (e.mei ? 'Sim' : 'Não') : (e.opcao_pelo_mei != null ? (e.opcao_pelo_mei ? 'Sim' : 'Não') : null));
+    set('rSimples', e.simples_nacional != null ? (e.simples_nacional ? 'Sim' : 'Não') : (e.opcao_pelo_simples != null ? (e.opcao_pelo_simples ? 'Sim' : 'Não') : null));
+
+    // Endereço
+    const partes = [e.logradouro, e.numero, e.complemento, e.bairro].filter(Boolean);
+    set('rEndereco', partes.length ? partes.join(', ') : null);
+    const cidade = [e.municipio, e.uf].filter(Boolean).join(' / ');
+    set('rCidade', cidade || null);
+    set('rCep', e.cep ? e.cep.replace(/^(\d{5})(\d{3})$/, '$1-$2') : null);
+
+    // Contato
+    const tel = e.ddd_telefone_1 ? '(' + e.ddd_telefone_1 + ') ' + e.telefone_1 : (e.telefone || null);
+    set('rTelefone', tel);
+    set('rEmail', e.email);
+
+    // CNAE principal
+    const cpWrap = document.getElementById('rCnaePrincipalWrap');
+    const cp = e.cnae_fiscal_descricao || (e.atividade_principal && e.atividade_principal[0]);
+    if (cp) {
+      const code = e.cnae_fiscal || (e.atividade_principal && e.atividade_principal[0] && e.atividade_principal[0].code) || '';
+      const desc = typeof cp === 'string' ? cp : (cp.text || cp.descricao || JSON.stringify(cp));
+      cpWrap.innerHTML = '<div class="cnae-principal"><div class="cnae-code">' + code + ' — Principal</div><div class="cnae-desc">' + desc + '</div></div>';
+    } else {
+      cpWrap.innerHTML = '';
+    }
+
+    // CNAEs secundários
+    const csWrap = document.getElementById('rCnaesSecWrap');
+    const cnaes = e.cnaes_secundarios || e.atividades_secundarias || [];
+    if (cnaes.length) {
+      csWrap.innerHTML = cnaes.map(c => {
+        const code = c.codigo || c.code || '';
+        const desc = c.descricao || c.text || '';
+        return '<span class="cnae-chip"><span>' + code + '</span>' + desc + '</span>';
+      }).join('');
+    } else {
+      csWrap.innerHTML = '';
+    }
+
+    // Sócios
+    const socios = e.qsa || e.socios || [];
+    const socSec = document.getElementById('sociosSection');
+    const socList = document.getElementById('rSocios');
+    if (socios.length) {
+      socSec.style.display = 'block';
+      socList.innerHTML = socios.map(s => {
+        const nome = s.nome_socio || s.nome || s.nome_socio_pf || '—';
+        const qual = s.qualificacao_socio || s.qualificacao || '';
+        const pais = s.pais || '';
+        const meta = [qual, pais].filter(Boolean).join(' · ');
+        return '<div class="socio-item"><div class="socio-nome">' + nome + '</div>' + (meta ? '<div class="socio-meta">' + meta + '</div>' : '') + '</div>';
+      }).join('');
+    } else {
+      socSec.style.display = 'none';
+    }
+  }
+</script>
+</body>
+</html>

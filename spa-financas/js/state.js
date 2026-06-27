@@ -1,13 +1,14 @@
 /* ============================================================================
- * QuitaState — modelo de dados + persistência (localStorage) + export/import
+ * SPAFinState — modelo de dados + persistência (localStorage) + export/import
  * ----------------------------------------------------------------------------
  * Camada de dados. Não calcula nada (isso é do engine.js) e não desenha nada
  * (isso é do ui.js / charts.js). Só guarda, carrega, valida e move dados.
  * ==========================================================================*/
-var QuitaState = (function () {
+var SPAFinState = (function () {
   'use strict';
 
-  var KEY = 'quita_state_v1';
+  var KEY = 'spa_financas_state_v1';
+  var LEGACY_KEY = 'quita_state_v1';   // migração dos dados do protótipo "Quita"
   var SCHEMA = 1;
 
   function nowISO() { return new Date().toISOString(); }
@@ -67,7 +68,16 @@ var QuitaState = (function () {
   function load() {
     try {
       var raw = localStorage.getItem(KEY);
-      if (!raw) return defaults();
+      if (!raw) {
+        // migra dados salvos sob a chave antiga ("Quita"), se existirem
+        var legacy = localStorage.getItem(LEGACY_KEY);
+        if (legacy) {
+          var migrated = migrate(JSON.parse(legacy));
+          save(migrated);
+          return migrated;
+        }
+        return defaults();
+      }
       return migrate(JSON.parse(raw));
     } catch (e) { return defaults(); }
   }
@@ -116,7 +126,7 @@ var QuitaState = (function () {
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
     a.href = url;
-    a.download = 'quita-backup-' + todayStr() + '.json';
+    a.download = 'spa-financas-backup-' + todayStr() + '.json';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

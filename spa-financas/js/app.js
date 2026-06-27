@@ -4,7 +4,7 @@
 (function () {
   'use strict';
 
-  var S = QuitaState, E = QuitaEngine, C = QuitaCharts, U = QuitaUI;
+  var S = SPAFinState, E = SPAFinEngine, C = SPAFinCharts, U = SPAFinUI;
 
   var state = S.load();
   var baselineExtra = state.monthlyExtra;   // referência do simulador "e se" (sessão)

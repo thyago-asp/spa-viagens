@@ -1,7 +1,7 @@
 /* ============================================================================
- * QuitaCharts — gráficos (Chart.js). Só desenha; recebe resultados do engine.
+ * SPAFinCharts — gráficos (Chart.js). Só desenha; recebe resultados do engine.
  * ==========================================================================*/
-var QuitaCharts = (function () {
+var SPAFinCharts = (function () {
   'use strict';
 
   var COLORS = {

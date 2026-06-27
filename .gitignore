@@ -1,6 +1,6 @@
 # Credenciais de deploy — NUNCA versionar
 .env
-quita/.env
+spa-financas/.env
 
 # Artefatos de build
 *.zip

@@ -1,8 +1,8 @@
 /* ============================================================================
- * QuitaUI — renderização do DOM e formatação. Não calcula, não persiste.
+ * SPAFinUI — renderização do DOM e formatação. Não calcula, não persiste.
  * Recebe estado + resultados do engine e desenha; dispara callbacks de eventos.
  * ==========================================================================*/
-var QuitaUI = (function () {
+var SPAFinUI = (function () {
   'use strict';
 
   var MESES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
@@ -142,10 +142,10 @@ var QuitaUI = (function () {
   /* ---- Painel de números-chave ---- */
   function renderPainel(state, results) {
     var box = el('painelContent');
-    var total = QuitaState.totalBalance(state);
+    var total = SPAFinState.totalBalance(state);
 
     // quanto caiu no mês: total no início do mês corrente vs agora
-    var ym = QuitaState.todayStr().slice(0, 7);
+    var ym = SPAFinState.todayStr().slice(0, 7);
     var baseline = null;
     state.snapshots.forEach(function (s) {
       if (s.date.slice(0, 7) < ym) baseline = s;            // último de meses anteriores

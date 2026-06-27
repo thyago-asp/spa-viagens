@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # ============================================================================
-# Deploy do Quita para o HostGator via FTP (FTPS) com lftp.
+# Deploy do SPA Finanças para o HostGator via FTP (FTPS) com lftp.
 #
 # Uso:
 #   1) cp .env.example .env   e preencha suas credenciais
-#   2) ./deploy-quita.sh
+#   2) ./deploy-spa-financas.sh
 #
 # Requisitos: lftp instalado
 #   - Ubuntu/Debian:  sudo apt install lftp
@@ -39,7 +39,7 @@ if ! command -v lftp >/dev/null 2>&1; then
   exit 1
 fi
 
-echo "→ Publicando Quita em $FTP_HOST:$REMOTE_DIR ..."
+echo "→ Publicando SPA Finanças em $FTP_HOST:$REMOTE_DIR ..."
 
 # mirror reverso (-R = local -> remoto). Sobe só o necessário.
 lftp -u "$FTP_USER","$FTP_PASS" -p "$FTP_PORT" "$FTP_HOST" <<EOF
@@ -50,7 +50,7 @@ set ftp:ssl-protect-data true
 mirror -R --delete --verbose \
   --exclude-glob .env \
   --exclude-glob .env.example \
-  --exclude-glob deploy-quita.sh \
+  --exclude-glob deploy-spa-financas.sh \
   --exclude-glob DEPLOY.md \
   --exclude-glob '*.zip' \
   ./ "$REMOTE_DIR"

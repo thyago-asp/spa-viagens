@@ -1,5 +1,5 @@
 /* ============================================================================
- * QuitaEngine — motor de simulação de quitação de dívidas
+ * SPAFinEngine — motor de simulação de quitação de dívidas
  * ----------------------------------------------------------------------------
  * PURO: sem DOM, sem localStorage, sem estado global. Recebe dados, devolve
  * resultados. Determinístico (a data inicial é um parâmetro, não new Date()).
@@ -12,7 +12,7 @@
  *   - interestRate: % AO MÊS (ex.: 12 = 12%/mês)
  *   - startDate: { year, month }  (month de 1 a 12)
  * ==========================================================================*/
-var QuitaEngine = (function () {
+var SPAFinEngine = (function () {
   'use strict';
 
   var MAX_MONTHS = 600; // teto de segurança da simulação (50 anos)

@@ -1,0 +1,6 @@
+# Credenciais de deploy — NUNCA versionar
+.env
+quita/.env
+
+# Artefatos de build
+*.zip

@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "monthlyExtra": 600,
+  "settings": { "recommendationThresholdPct": 10 },
+  "snapshots": [],
+  "debts": [
+    { "id": "d_ex1", "name": "Cartão de crédito", "balance": 4200, "interestRate": 13.5, "minPayment": 380, "dueDay": 8 },
+    { "id": "d_ex2", "name": "Cheque especial", "balance": 1800, "interestRate": 8, "minPayment": 150, "dueDay": 1 },
+    { "id": "d_ex3", "name": "Empréstimo pessoal", "balance": 9500, "interestRate": 3.2, "minPayment": 520, "dueDay": 15 },
+    { "id": "d_ex4", "name": "Crediário loja", "balance": 700, "interestRate": 4.5, "minPayment": 120, "dueDay": 20 }
+  ]
+}

@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quita — Saia das dívidas pela velocidade de caixa</title>
+  <meta name="description" content="Plano de saída das dívidas priorizado por velocidade de caixa: ataque uma dívida por vez, libere parcela e role o valor pra próxima. Acompanhe por métricas simples."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;1,400&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --black:  #0a0a0a;
+      --black2: #111111;
+      --black3: #1c1c1c;
+      --lime:   #CBFF00;
+      --lime-dk:#a8d400;
+      --white:  #ffffff;
+      --gray:   #666666;
+      --gray-lt:#999999;
+      --border: rgba(255,255,255,0.08);
+      --border-focus: rgba(203,255,0,0.5);
+      --red:    #ff4d4d;
+      --green:  #4dd07a;
+      --display:'Playfair Display', Georgia, serif;
+      --body:   'Montserrat', system-ui, sans-serif;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: var(--body);
+      font-weight: 300;
+      font-size: 15px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 2.5rem;
+      background: rgba(10,10,10,0.95);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(10px);
+    }
+    .brand { display: flex; align-items: baseline; gap: 0.5rem; }
+    .brand .logo {
+      font-family: var(--display); font-size: 1.5rem; color: var(--white);
+      letter-spacing: 0.02em;
+    }
+    .brand .logo b { color: var(--lime); font-weight: 400; }
+    .brand .tag {
+      font-size: 0.6rem; font-weight: 600; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--gray-lt);
+    }
+    .header-actions { display: flex; align-items: center; gap: 1rem; }
+    .ghost-btn {
+      background: transparent; border: 1px solid var(--border);
+      color: var(--gray-lt); font-family: var(--body);
+      font-size: 0.66rem; font-weight: 600; letter-spacing: 0.14em;
+      text-transform: uppercase; padding: 0.5rem 0.9rem; border-radius: 2px;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .ghost-btn:hover { color: var(--lime); border-color: var(--border-focus); }
+
+    /* ── TABS ── */
+    nav.tabs {
+      position: fixed; top: 70px; left: 0; right: 0; z-index: 40;
+      display: flex; gap: 0.25rem; padding: 0 2.5rem;
+      background: rgba(10,10,10,0.95); border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(10px); overflow-x: auto;
+    }
+    .tab {
+      font-size: 0.7rem; font-weight: 600; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--gray); cursor: pointer;
+      padding: 1rem 1.1rem; border-bottom: 2px solid transparent;
+      transition: color 0.2s, border-color 0.2s; white-space: nowrap;
+      user-select: none;
+    }
+    .tab:hover { color: var(--gray-lt); }
+    .tab.active { color: var(--lime); border-bottom-color: var(--lime); }
+
+    /* ── LAYOUT ── */
+    main { max-width: 1080px; margin: 0 auto; padding: 150px 2rem 6rem; }
+    .panel { display: none; animation: panelIn 0.35s ease; }
+    .panel.active { display: block; }
+    @keyframes panelIn { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform:none; } }
+
+    .panel-head { margin-bottom: 2.5rem; }
+    .panel-head h1 {
+      font-family: var(--display); font-weight: 400;
+      font-size: clamp(1.9rem, 4vw, 2.8rem); margin-bottom: 0.5rem;
+    }
+    .panel-head h1 .accent { color: var(--lime); font-style: italic; }
+    .panel-head p { font-size: 0.86rem; color: var(--gray-lt); max-width: 620px; }
+
+    .section-label {
+      font-size: 0.66rem; font-weight: 700; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--gray); margin: 2.5rem 0 1rem;
+    }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--black2); border: 1px solid var(--border);
+      border-radius: 4px; padding: 1.5rem;
+    }
+    .card + .card { margin-top: 1rem; }
+
+    /* ── FIELDS ── */
+    label {
+      display: block; font-size: 0.64rem; font-weight: 600;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--gray-lt); margin-bottom: 0.5rem;
+    }
+    input, select {
+      width: 100%; background: var(--black3); border: 1px solid var(--border);
+      color: var(--white); font-family: var(--body); font-size: 0.95rem;
+      font-weight: 300; padding: 0.7rem 0.85rem; border-radius: 3px;
+      transition: border-color 0.2s;
+    }
+    input:focus, select:focus { outline: none; border-color: var(--border-focus); }
+    input::placeholder { color: var(--gray); }
+    select { cursor: pointer; }
+    .field { margin-bottom: 1.1rem; }
+    .grid-fields { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 1rem; align-items: end; }
+
+    /* ── BUTTONS ── */
+    .btn {
+      background: var(--lime); color: var(--black); border: none;
+      font-family: var(--body); font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      padding: 0.8rem 1.4rem; border-radius: 3px; cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .btn:hover { background: var(--lime-dk); }
+    .btn:active { transform: translateY(1px); }
+    .btn-sm { padding: 0.6rem 1rem; font-size: 0.66rem; }
+    .icon-btn {
+      background: transparent; border: none; color: var(--gray);
+      cursor: pointer; font-size: 1.1rem; line-height: 1; padding: 0.3rem;
+      transition: color 0.2s;
+    }
+    .icon-btn:hover { color: var(--red); }
+
+    /* ── DEBT TABLE ── */
+    .debt-row {
+      display: grid;
+      grid-template-columns: 1.6fr 1fr 1fr 1fr 40px;
+      gap: 1rem; align-items: center;
+      padding: 0.9rem 1.1rem; border: 1px solid var(--border);
+      border-radius: 3px; background: var(--black2); margin-bottom: 0.6rem;
+    }
+    .debt-row .dname { font-weight: 500; }
+    .debt-row .dval { font-size: 0.86rem; color: var(--gray-lt); }
+    .debt-row .dval b { color: var(--white); font-weight: 500; }
+    .col-head {
+      display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr 40px;
+      gap: 1rem; padding: 0 1.1rem; margin-bottom: 0.5rem;
+    }
+    .col-head span {
+      font-size: 0.6rem; font-weight: 600; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--gray);
+    }
+
+    /* ── METRICS ── */
+    .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+    .metric {
+      background: var(--black2); border: 1px solid var(--border);
+      border-radius: 4px; padding: 1.4rem 1.3rem;
+    }
+    .metric .mlabel {
+      font-size: 0.6rem; font-weight: 600; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--gray); margin-bottom: 0.6rem;
+    }
+    .metric .mvalue {
+      font-family: var(--display); font-size: 1.9rem; color: var(--white);
+      line-height: 1.1;
+    }
+    .metric .mvalue.lime { color: var(--lime); }
+    .metric .mvalue.green { color: var(--green); }
+    .metric .msub { font-size: 0.72rem; color: var(--gray-lt); margin-top: 0.3rem; }
+
+    /* ── PROGRESS BAR ── */
+    .progress-wrap { margin: 1.2rem 0; }
+    .progress-bar {
+      height: 10px; background: var(--black3); border-radius: 6px;
+      overflow: hidden; border: 1px solid var(--border);
+    }
+    .progress-fill {
+      height: 100%; background: linear-gradient(90deg, var(--lime-dk), var(--lime));
+      border-radius: 6px; transition: width 0.6s ease; width: 0;
+    }
+
+    /* ── PLAN STEPS ── */
+    .plan-step {
+      display: grid; grid-template-columns: 44px 1fr auto; gap: 1.1rem;
+      align-items: center; padding: 1.1rem 1.3rem;
+      background: var(--black2); border: 1px solid var(--border);
+      border-radius: 4px; margin-bottom: 0.7rem;
+    }
+    .plan-step.target { border-color: var(--border-focus); background: rgba(203,255,0,0.04); }
+    .plan-step .pnum {
+      width: 44px; height: 44px; border-radius: 50%;
+      border: 1px solid var(--border); display: flex; align-items: center;
+      justify-content: center; font-family: var(--display); font-size: 1.2rem;
+      color: var(--gray-lt);
+    }
+    .plan-step.target .pnum { border-color: var(--lime); color: var(--lime); }
+    .plan-step .pname { font-weight: 500; font-size: 1rem; }
+    .plan-step .pmeta { font-size: 0.76rem; color: var(--gray-lt); margin-top: 0.2rem; }
+    .plan-step .ptag {
+      font-size: 0.6rem; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; padding: 0.3rem 0.7rem; border-radius: 999px;
+    }
+    .ptag.foco { background: var(--lime); color: var(--black); }
+    .ptag.minimo { background: var(--black3); color: var(--gray-lt); border: 1px solid var(--border); }
+    .ptag.quitada { background: rgba(77,208,122,0.15); color: var(--green); }
+
+    /* ── COMPARISON ── */
+    .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; }
+    .compare .card h3 { font-family: var(--display); font-weight: 400; font-size: 1.2rem; margin-bottom: 0.8rem; }
+    .compare .stat { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--border); font-size: 0.86rem; }
+    .compare .stat:last-child { border-bottom: none; }
+    .compare .stat span:last-child { font-weight: 600; }
+    .winner { border-color: var(--border-focus); }
+    .winner-tag { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--lime); }
+
+    /* ── DAILY BLOCKS ── */
+    .habit {
+      display: flex; align-items: center; gap: 0.9rem;
+      padding: 0.85rem 1.1rem; background: var(--black2);
+      border: 1px solid var(--border); border-radius: 3px; margin-bottom: 0.5rem;
+      cursor: pointer; transition: border-color 0.2s;
+    }
+    .habit:hover { border-color: var(--border-focus); }
+    .habit .chk {
+      width: 22px; height: 22px; border: 1px solid var(--gray);
+      border-radius: 3px; flex-shrink: 0; display: flex;
+      align-items: center; justify-content: center; transition: all 0.2s;
+    }
+    .habit.done .chk { background: var(--lime); border-color: var(--lime); }
+    .habit.done .chk::after { content: "✓"; color: var(--black); font-weight: 700; font-size: 0.8rem; }
+    .habit.done .htext { color: var(--gray-lt); text-decoration: line-through; }
+    .habit .htext { font-size: 0.9rem; }
+
+    /* ── ALERT ── */
+    .alert {
+      border: 1px solid; border-radius: 4px; padding: 1rem 1.2rem;
+      font-size: 0.84rem; margin: 1rem 0; display: flex; gap: 0.7rem;
+    }
+    .alert.warn { border-color: rgba(255,77,77,0.4); background: rgba(255,77,77,0.06); color: #ffb3b3; }
+    .alert.info { border-color: var(--border); background: var(--black2); color: var(--gray-lt); }
+    .alert b { color: var(--white); font-weight: 600; }
+
+    .empty {
+      text-align: center; padding: 3rem 1rem; color: var(--gray);
+      border: 1px dashed var(--border); border-radius: 4px;
+    }
+    .helper { font-size: 0.74rem; color: var(--gray); margin-top: 0.4rem; }
+    .strat-row { display: flex; align-items: end; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+    .strat-row .field { margin-bottom: 0; min-width: 200px; }
+    .timeline-note { font-size: 0.8rem; color: var(--gray-lt); margin-top: 1rem; }
+
+    footer {
+      text-align: center; padding: 2rem; color: var(--gray);
+      font-size: 0.72rem; border-top: 1px solid var(--border);
+    }
+    footer b { color: var(--gray-lt); font-weight: 500; }
+
+    @media (max-width: 760px) {
+      header, nav.tabs { padding-left: 1rem; padding-right: 1rem; }
+      main { padding: 150px 1rem 4rem; }
+      .grid-fields { grid-template-columns: 1fr 1fr; }
+      .metrics { grid-template-columns: 1fr 1fr; }
+      .debt-row, .col-head { grid-template-columns: 1.4fr 1fr 36px; }
+      .debt-row .dcol-hide, .col-head .dcol-hide { display: none; }
+      .compare { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="logo">Quita<b>.</b></span>
+      <span class="tag">Velocidade de caixa</span>
+    </div>
+    <div class="header-actions">
+      <button class="ghost-btn" id="btnReset">Limpar dados</button>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <div class="tab active" data-tab="dividas">Dívidas</div>
+    <div class="tab" data-tab="plano">Plano de ataque</div>
+    <div class="tab" data-tab="painel">Painel</div>
+    <div class="tab" data-tab="hoje">Bloco de hoje</div>
+  </nav>
+
+  <main>
+    <!-- ─────────── DÍVIDAS ─────────── -->
+    <section class="panel active" id="panel-dividas">
+      <div class="panel-head">
+        <h1>Suas <span class="accent">dívidas</span></h1>
+        <p>Liste tudo o que você deve. O plano não começa pela emoção — começa pelo número.
+        Quanto mais real for esta lista, mais rápido o caixa volta a sobrar.</p>
+      </div>
+
+      <div class="card">
+        <div class="section-label" style="margin-top:0">Adicionar dívida</div>
+        <div class="grid-fields">
+          <div class="field" style="margin:0">
+            <label>Nome / credor</label>
+            <input id="inName" placeholder="Ex: Cartão Nubank, Empréstimo X"/>
+          </div>
+          <div class="field" style="margin:0">
+            <label>Saldo devedor (R$)</label>
+            <input id="inBalance" type="number" min="0" step="0.01" placeholder="0,00"/>
+          </div>
+          <div class="field" style="margin:0">
+            <label>Juros % a.m.</label>
+            <input id="inRate" type="number" min="0" step="0.01" placeholder="0"/>
+          </div>
+          <div class="field" style="margin:0">
+            <label>Parcela mín. (R$)</label>
+            <input id="inMin" type="number" min="0" step="0.01" placeholder="0,00"/>
+          </div>
+        </div>
+        <p class="helper">Juros ao mês: cartão rotativo costuma ficar entre 8% e 14%. Não sabe? Deixe 0 — você ainda vê a ordem por velocidade.</p>
+        <div style="margin-top:1.2rem"><button class="btn" id="btnAddDebt">+ Adicionar dívida</button></div>
+      </div>
+
+      <div class="section-label">Lista de dívidas</div>
+      <div id="debtList"></div>
+
+      <div class="card" style="margin-top:1.5rem">
+        <div class="field" style="margin:0; max-width:320px">
+          <label>Quanto sobra por mês p/ atacar dívida (R$)</label>
+          <input id="inExtra" type="number" min="0" step="0.01" placeholder="0,00"/>
+          <p class="helper">É o "extra" além das parcelas mínimas. Esse é o seu motor de saída.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─────────── PLANO ─────────── -->
+    <section class="panel" id="panel-plano">
+      <div class="panel-head">
+        <h1>Plano de <span class="accent">ataque</span></h1>
+        <p>O mesmo princípio que usei pra fazer caixa no negócio: não espalhe o esforço.
+        Concentre tudo em <b>uma dívida por vez</b>, quite, e <b>role a parcela liberada</b> pra próxima.
+        Cada quitação acelera a seguinte.</p>
+      </div>
+
+      <div class="strat-row">
+        <div class="field">
+          <label>Critério de priorização</label>
+          <select id="selStrategy">
+            <option value="velocidade">Velocidade de caixa (quita a menor primeiro)</option>
+            <option value="juros">Menos juros total (ataca a mais cara primeiro)</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="planContent"></div>
+    </section>
+
+    <!-- ─────────── PAINEL ─────────── -->
+    <section class="panel" id="panel-painel">
+      <div class="panel-head">
+        <h1>Painel de <span class="accent">métricas</span></h1>
+        <p>Quatro números, como no negócio. Olhe todo dia. O que se mede, sai do lugar.</p>
+      </div>
+      <div id="painelContent"></div>
+    </section>
+
+    <!-- ─────────── HOJE ─────────── -->
+    <section class="panel" id="panel-hoje">
+      <div class="panel-head">
+        <h1>Bloco de <span class="accent">hoje</span></h1>
+        <p id="todayLabel">Organize o dia em blocos. Marque o que fez. Constância vence intensidade.</p>
+      </div>
+
+      <div class="section-label" style="margin-top:0">Hábitos do dia</div>
+      <div id="habitList"></div>
+
+      <div class="section-label">Registro rápido de hoje</div>
+      <div class="card">
+        <div class="grid-fields" style="grid-template-columns:1fr 1fr">
+          <div class="field" style="margin:0">
+            <label>Gastei hoje (R$)</label>
+            <input id="inSpent" type="number" min="0" step="0.01" placeholder="0,00"/>
+          </div>
+          <div class="field" style="margin:0">
+            <label>Paguei em dívida hoje (R$)</label>
+            <input id="inPaid" type="number" min="0" step="0.01" placeholder="0,00"/>
+          </div>
+        </div>
+        <div style="margin-top:1.1rem"><button class="btn btn-sm" id="btnSaveDay">Salvar dia</button></div>
+      </div>
+      <div id="todaySummary"></div>
+    </section>
+  </main>
+
+  <footer>
+    <b>Quita.</b> — protótipo de saída das dívidas por velocidade de caixa · feito por SPA Soluções em TI · seus dados ficam só neste navegador
+  </footer>
+
+  <script>
+  (function () {
+    'use strict';
+
+    var KEY = 'quita_state_v1';
+    var MAX_MONTHS = 600;
+
+    var defaultState = { debts: [], extra: 0, strategy: 'velocidade', days: {} };
+    var state = load();
+
+    function load() {
+      try {
+        var raw = localStorage.getItem(KEY);
+        if (!raw) return clone(defaultState);
+        var s = JSON.parse(raw);
+        s.debts = s.debts || [];
+        s.days = s.days || {};
+        s.extra = s.extra || 0;
+        s.strategy = s.strategy || 'velocidade';
+        return s;
+      } catch (e) { return clone(defaultState); }
+    }
+    function save() { localStorage.setItem(KEY, JSON.stringify(state)); }
+    function clone(o) { return JSON.parse(JSON.stringify(o)); }
+
+    function brl(n) {
+      if (!isFinite(n)) n = 0;
+      return 'R$ ' + Number(n).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+    function brl0(n) {
+      if (!isFinite(n)) n = 0;
+      return 'R$ ' + Math.round(Number(n)).toLocaleString('pt-BR');
+    }
+    function num(v) { var n = parseFloat(v); return isFinite(n) && n > 0 ? n : 0; }
+    function uid() { return 'd' + Math.floor(performance.now() * 1000).toString(36) + state.debts.length; }
+    function todayKey() {
+      var d = new Date();
+      return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+
+    /* ───── TABS ───── */
+    var tabs = document.querySelectorAll('.tab');
+    tabs.forEach(function (t) {
+      t.addEventListener('click', function () {
+        tabs.forEach(function (x) { x.classList.remove('active'); });
+        t.classList.add('active');
+        document.querySelectorAll('.panel').forEach(function (p) { p.classList.remove('active'); });
+        document.getElementById('panel-' + t.dataset.tab).classList.add('active');
+        renderAll();
+      });
+    });
+
+    /* ───── DEBTS ───── */
+    var elName = document.getElementById('inName');
+    var elBalance = document.getElementById('inBalance');
+    var elRate = document.getElementById('inRate');
+    var elMin = document.getElementById('inMin');
+    var elExtra = document.getElementById('inExtra');
+
+    document.getElementById('btnAddDebt').addEventListener('click', function () {
+      var name = (elName.value || '').trim();
+      var balance = num(elBalance.value);
+      if (!name) { elName.focus(); return; }
+      if (!balance) { elBalance.focus(); return; }
+      state.debts.push({
+        id: uid(), name: name, balance: balance,
+        rate: num(elRate.value), min: num(elMin.value)
+      });
+      elName.value = ''; elBalance.value = ''; elRate.value = ''; elMin.value = '';
+      save(); elName.focus(); renderAll();
+    });
+
+    elExtra.addEventListener('input', function () { state.extra = num(elExtra.value); save(); renderPlan(); renderPainel(); });
+
+    function renderDebts() {
+      var list = document.getElementById('debtList');
+      if (!state.debts.length) {
+        list.innerHTML = '<div class="empty">Nenhuma dívida ainda. Adicione a primeira acima — até as pequenas contam.</div>';
+        return;
+      }
+      var html = '<div class="col-head">' +
+        '<span>Dívida</span><span>Saldo</span>' +
+        '<span class="dcol-hide">Juros a.m.</span><span class="dcol-hide">Parcela mín.</span><span></span></div>';
+      state.debts.forEach(function (d) {
+        html += '<div class="debt-row">' +
+          '<div class="dname">' + esc(d.name) + '</div>' +
+          '<div class="dval"><b>' + brl(d.balance) + '</b></div>' +
+          '<div class="dval dcol-hide">' + (d.rate ? d.rate + '%' : '—') + '</div>' +
+          '<div class="dval dcol-hide">' + (d.min ? brl(d.min) : '—') + '</div>' +
+          '<button class="icon-btn" data-del="' + d.id + '" title="Remover">✕</button>' +
+          '</div>';
+      });
+      list.innerHTML = html;
+      list.querySelectorAll('[data-del]').forEach(function (b) {
+        b.addEventListener('click', function () {
+          state.debts = state.debts.filter(function (d) { return d.id !== b.dataset.del; });
+          save(); renderAll();
+        });
+      });
+    }
+    function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+    /* ───── SIMULATION ENGINE ─────
+       Concentra todo o orçamento em um alvo por vez (na ordem da estratégia),
+       paga mínimos nos outros e rola a parcela liberada. */
+    function order(debts, strategy) {
+      var arr = debts.slice();
+      if (strategy === 'juros') {
+        arr.sort(function (a, b) { return (b.rate - a.rate) || (a.balance - b.balance); });
+      } else {
+        arr.sort(function (a, b) { return (a.balance - b.balance) || (b.rate - a.rate); });
+      }
+      return arr;
+    }
+
+    function simulate(strategy) {
+      var debts = state.debts.filter(function (d) { return d.balance > 0; });
+      if (!debts.length) return null;
+
+      var ordered = order(debts, strategy);
+      var sumMin = debts.reduce(function (s, d) { return s + d.min; }, 0);
+      var budget = sumMin + state.extra; // orçamento mensal total fixo
+
+      // estado de simulação
+      var sim = ordered.map(function (d) {
+        return { id: d.id, name: d.name, rate: d.rate / 100, min: d.min, bal: d.balance, paidOff: null };
+      });
+
+      var totalInterest = 0;
+      var month = 0;
+      var stalled = false;
+
+      function remaining() { return sim.filter(function (d) { return d.bal > 0.005; }); }
+
+      while (remaining().length && month < MAX_MONTHS) {
+        month++;
+        // 1) juros do mês
+        sim.forEach(function (d) {
+          if (d.bal > 0.005) { var i = d.bal * d.rate; d.bal += i; totalInterest += i; }
+        });
+        // 2) orçamento do mês
+        var pool = budget;
+        var active = remaining();
+        // paga mínimos primeiro (mas nunca mais que o saldo)
+        active.forEach(function (d) {
+          var pay = Math.min(d.min, d.bal, pool);
+          d.bal -= pay; pool -= pay;
+        });
+        // 3) sobra vai toda pro primeiro alvo ainda em aberto (ordem da estratégia)
+        for (var k = 0; k < sim.length && pool > 0.005; k++) {
+          var t = sim[k];
+          if (t.bal > 0.005) {
+            var extraPay = Math.min(pool, t.bal);
+            t.bal -= extraPay; pool -= extraPay;
+          }
+        }
+        // marca quitadas
+        sim.forEach(function (d) {
+          if (d.bal <= 0.005 && d.paidOff === null) { d.bal = 0; d.paidOff = month; }
+        });
+        // detecta estagnação (orçamento não cobre nem juros + amortização)
+        if (month > 2 && budget <= totalMinShortfall(active)) { stalled = true; break; }
+      }
+
+      return {
+        months: month,
+        totalInterest: totalInterest,
+        budget: budget,
+        sumMin: sumMin,
+        ordered: sim,
+        freedom: addMonths(month),
+        stalled: stalled || month >= MAX_MONTHS
+      };
+    }
+
+    function totalMinShortfall(active) {
+      // soma de juros mensais correntes; se orçamento < isso, nunca quita
+      return active.reduce(function (s, d) { return s + d.bal * d.rate; }, 0);
+    }
+
+    function addMonths(m) {
+      var d = new Date();
+      d.setDate(1);
+      d.setMonth(d.getMonth() + m);
+      return d.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+    }
+
+    /* ───── PLANO ───── */
+    var selStrategy = document.getElementById('selStrategy');
+    selStrategy.addEventListener('change', function () { state.strategy = selStrategy.value; save(); renderPlan(); });
+
+    function renderPlan() {
+      selStrategy.value = state.strategy;
+      var el = document.getElementById('planContent');
+      var active = state.debts.filter(function (d) { return d.balance > 0; });
+      if (!active.length) {
+        el.innerHTML = '<div class="empty">Cadastre suas dívidas na aba <b>Dívidas</b> para gerar o plano.</div>';
+        return;
+      }
+
+      var sim = simulate(state.strategy);
+      var html = '';
+
+      if (state.extra <= 0) {
+        html += '<div class="alert info">📌 Você ainda não definiu <b>quanto sobra por mês</b>. ' +
+          'Sem esse "extra", você só paga mínimos e a dívida quase não anda. Defina um valor na aba Dívidas — ' +
+          'mesmo R$ 100 mudam a velocidade.</div>';
+      }
+
+      if (sim.stalled) {
+        html += '<div class="alert warn">⚠️ <span><b>O orçamento atual não vence os juros.</b> ' +
+          'A soma de parcela mínima + extra não cobre os juros que correm todo mês, então a dívida não fecha. ' +
+          'Caminhos: aumentar o extra, renegociar a taxa, ou portar a dívida mais cara para uma linha mais barata.</span></div>';
+      }
+
+      // ordem de ataque
+      html += '<div class="section-label" style="margin-top:0">Ordem de ataque</div>';
+      sim.ordered.forEach(function (d, i) {
+        var isTarget = i === 0;
+        var meta;
+        if (d.paidOff) meta = 'Quitada no mês ' + d.paidOff + ' · ' + addMonths(d.paidOff);
+        else meta = 'Não quita no horizonte simulado';
+        var tag = isTarget ? '<span class="ptag foco">Foco agora</span>'
+          : '<span class="ptag minimo">Só o mínimo</span>';
+        html += '<div class="plan-step' + (isTarget ? ' target' : '') + '">' +
+          '<div class="pnum">' + (i + 1) + '</div>' +
+          '<div><div class="pname">' + esc(d.name) + '</div>' +
+          '<div class="pmeta">Saldo ' + brl(findBal(d.id)) +
+          (d.rate ? ' · ' + (d.rate * 100) + '% a.m.' : '') + ' · ' + meta + '</div></div>' +
+          tag + '</div>';
+      });
+
+      // resumo
+      html += '<div class="section-label">Resultado do plano</div>';
+      html += '<div class="metrics">' +
+        metric('Tempo até zerar', sim.stalled ? '—' : sim.months + ' meses', sim.stalled ? 'ajuste o orçamento' : sim.freedom, 'lime') +
+        metric('Orçamento mensal', brl0(sim.budget), brl0(sim.sumMin) + ' mín + ' + brl0(state.extra) + ' extra', '') +
+        metric('Juros que você vai pagar', brl0(sim.totalInterest), 'no caminho até quitar', '') +
+        metric('Parcela a liberar', brl0(sim.sumMin), 'volta pro seu caixa ao fim', 'green') +
+        '</div>';
+
+      // comparação de estratégias
+      var simV = simulate('velocidade');
+      var simJ = simulate('juros');
+      if (simV && simJ && !simV.stalled && !simJ.stalled) {
+        var fasterMonths = Math.min(simV.months, simJ.months);
+        var cheaper = simV.totalInterest <= simJ.totalInterest ? 'velocidade' : 'juros';
+        var faster = simV.months <= simJ.months ? 'velocidade' : 'juros';
+        html += '<div class="section-label">Velocidade de caixa × Menos juros</div>';
+        html += '<div class="compare">' +
+          compareCard('Velocidade de caixa', simV, faster === 'velocidade', cheaper === 'velocidade') +
+          compareCard('Menos juros total', simJ, faster === 'juros', cheaper === 'juros') +
+          '</div>';
+        html += '<p class="timeline-note">Velocidade de caixa quita dívidas inteiras mais cedo — ' +
+          'cada parcela que some é alívio imediato e uma vitória que mantém o plano de pé. ' +
+          'Menos juros economiza no total, mas o alívio demora mais a aparecer. ' +
+          'Sob pressão de caixa, a primeira costuma ganhar.</p>';
+      }
+
+      el.innerHTML = html;
+    }
+
+    function findBal(id) {
+      var d = state.debts.find(function (x) { return x.id === id; });
+      return d ? d.balance : 0;
+    }
+    function compareCard(title, sim, isFaster, isCheaper) {
+      return '<div class="card' + ((isFaster || isCheaper) ? ' winner' : '') + '">' +
+        '<h3>' + title + (isFaster ? ' <span class="winner-tag">+ rápido</span>' : '') + (isCheaper ? ' <span class="winner-tag">+ barato</span>' : '') + '</h3>' +
+        '<div class="stat"><span>Tempo até zerar</span><span>' + sim.months + ' meses</span></div>' +
+        '<div class="stat"><span>Liberdade em</span><span>' + sim.freedom + '</span></div>' +
+        '<div class="stat"><span>Juros totais</span><span>' + brl0(sim.totalInterest) + '</span></div>' +
+        '</div>';
+    }
+    function metric(label, value, sub, cls) {
+      return '<div class="metric"><div class="mlabel">' + label + '</div>' +
+        '<div class="mvalue ' + (cls || '') + '">' + value + '</div>' +
+        '<div class="msub">' + (sub || '') + '</div></div>';
+    }
+
+    /* ───── PAINEL ───── */
+    function renderPainel() {
+      var el = document.getElementById('painelContent');
+      var totalDebt = state.debts.reduce(function (s, d) { return s + d.balance; }, 0);
+
+      // pagamentos acumulados a partir do registro diário
+      var paidTotal = 0, spentTotal = 0, monthPaid = 0;
+      var tk = todayKey();
+      var thisMonth = tk.slice(0, 7);
+      Object.keys(state.days).forEach(function (k) {
+        var d = state.days[k];
+        paidTotal += (d.paid || 0);
+        spentTotal += (d.spent || 0);
+        if (k.slice(0, 7) === thisMonth) monthPaid += (d.paid || 0);
+      });
+
+      var sim = simulate(state.strategy);
+      var pct = (totalDebt + paidTotal) > 0 ? Math.min(100, Math.round((paidTotal / (totalDebt + paidTotal)) * 100)) : 0;
+
+      var html = '<div class="metrics">' +
+        metric('Dívida em aberto', brl0(totalDebt), state.debts.length + ' dívida(s)', '') +
+        metric('Pago até agora', brl0(paidTotal), 'registrado no bloco diário', 'green') +
+        metric('Pago neste mês', brl0(monthPaid), thisMonth.split('-').reverse().join('/'), 'lime') +
+        metric('Liberdade prevista', sim && !sim.stalled ? sim.freedom : '—', sim && !sim.stalled ? sim.months + ' meses' : 'defina orçamento', 'lime') +
+        '</div>';
+
+      html += '<div class="card" style="margin-top:1.5rem">' +
+        '<div class="mlabel" style="font-size:0.6rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--gray);margin-bottom:0.6rem">Progresso de quitação</div>' +
+        '<div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:' + pct + '%"></div></div></div>' +
+        '<div class="msub" style="font-size:0.8rem;color:var(--gray-lt)">' + pct + '% pago · ' + brl0(totalDebt) + ' restando</div>' +
+        '</div>';
+
+      html += '<div class="alert info" style="margin-top:1.5rem">💡 <span>Mesma lógica do negócio: ' +
+        '<b>antes de pegar crédito novo, cuide do que já existe.</b> Renegociar uma taxa ou quitar a menor dívida ' +
+        'é o "caixa mais barato" — resultado mais perto, com menos esforço.</span></div>';
+
+      el.innerHTML = html;
+    }
+
+    /* ───── HOJE / BLOCOS ───── */
+    var HABITS = [
+      'Planejei o dia (3 prioridades de caixa)',
+      'Registrei o que gastei',
+      'Não criei dívida nova hoje',
+      'Dei um passo numa dívida (pagar / renegociar / ligar)',
+      'Olhei o painel de métricas',
+      'Fechei o dia (revisei e anotei)'
+    ];
+
+    function getDay(k) {
+      if (!state.days[k]) state.days[k] = { habits: {}, spent: 0, paid: 0 };
+      if (!state.days[k].habits) state.days[k].habits = {};
+      return state.days[k];
+    }
+
+    function renderHoje() {
+      var tk = todayKey();
+      var day = getDay(tk);
+      var d = new Date();
+      document.getElementById('todayLabel').textContent =
+        d.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' }) +
+        ' — organize o dia em blocos. Marque o que fez. Constância vence intensidade.';
+
+      var list = document.getElementById('habitList');
+      var html = '';
+      HABITS.forEach(function (h, i) {
+        var done = !!day.habits[i];
+        html += '<div class="habit' + (done ? ' done' : '') + '" data-h="' + i + '">' +
+          '<div class="chk"></div><div class="htext">' + esc(h) + '</div></div>';
+      });
+      list.innerHTML = html;
+      list.querySelectorAll('[data-h]').forEach(function (row) {
+        row.addEventListener('click', function () {
+          var i = row.dataset.h;
+          day.habits[i] = !day.habits[i];
+          save(); renderHoje();
+        });
+      });
+
+      document.getElementById('inSpent').value = day.spent || '';
+      document.getElementById('inPaid').value = day.paid || '';
+
+      var doneCount = HABITS.filter(function (_, i) { return day.habits[i]; }).length;
+      document.getElementById('todaySummary').innerHTML =
+        '<div class="alert info" style="margin-top:1.5rem">Hoje: <b>' + doneCount + '/' + HABITS.length + '</b> hábitos · ' +
+        'gasto <b>' + brl(day.spent || 0) + '</b> · pago em dívida <b>' + brl(day.paid || 0) + '</b></div>';
+    }
+
+    document.getElementById('btnSaveDay').addEventListener('click', function () {
+      var day = getDay(todayKey());
+      day.spent = num(document.getElementById('inSpent').value);
+      day.paid = num(document.getElementById('inPaid').value);
+      save(); renderHoje(); renderPainel();
+    });
+
+    /* ───── RESET ───── */
+    document.getElementById('btnReset').addEventListener('click', function () {
+      if (confirm('Apagar todos os dados deste navegador? Não dá pra desfazer.')) {
+        state = clone(defaultState);
+        localStorage.removeItem(KEY);
+        elExtra.value = '';
+        renderAll();
+      }
+    });
+
+    /* ───── RENDER ALL ───── */
+    function renderAll() {
+      renderDebts();
+      elExtra.value = state.extra || '';
+      selStrategy.value = state.strategy;
+      renderPlan();
+      renderPainel();
+      renderHoje();
+    }
+
+    renderAll();
+  })();
+  </script>
+</body>
+</html>

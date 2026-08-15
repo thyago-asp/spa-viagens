@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SPA Viagens | Agência de Viagens e Concierge em Curitiba</title>
-  <meta name="description" content="Agência de viagens em Curitiba especializada em concierge completo, milhas aéreas e atendimento personalizado. Do planejamento ao retorno — cuidamos de tudo por você. Solicite seu orçamento." />
+  <meta name="description" content="Agência de viagens em Curitiba especializada em concierge completo, milhas aéreas e atendimento personalizado. Do planejamento ao retorno, cuidamos de tudo por você. Solicite a sua cotação." />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://spaviagens.com.br/" />
 
@@ -14,13 +14,13 @@
   <meta property="og:site_name"   content="SPA Viagens" />
   <meta property="og:url"         content="https://spaviagens.com.br/" />
   <meta property="og:title"       content="SPA Viagens | Agência de Viagens e Concierge em Curitiba" />
-  <meta property="og:description" content="Concierge completo, especialistas em milhas aéreas e atendimento humanizado. Solicite seu orçamento de viagem sem compromisso." />
+  <meta property="og:description" content="Concierge completo, especialistas em milhas aéreas e atendimento humanizado. Solicite a sua cotação de viagem sem compromisso." />
   <meta property="og:image"       content="https://spaviagens.com.br/img/logospa.png" />
 
   <!-- Twitter Card -->
   <meta name="twitter:card"        content="summary_large_image" />
   <meta name="twitter:title"       content="SPA Viagens | Agência de Viagens e Concierge em Curitiba" />
-  <meta name="twitter:description" content="Concierge completo, especialistas em milhas aéreas e atendimento humanizado. Solicite seu orçamento." />
+  <meta name="twitter:description" content="Concierge completo, especialistas em milhas aéreas e atendimento humanizado. Solicite a sua cotação." />
   <meta name="twitter:image"       content="https://spaviagens.com.br/img/logospa.png" />
 
   <!-- Schema.org JSON-LD -->
@@ -930,6 +930,24 @@
       .roteiro-case { padding: 1.5rem; }
     }
 
+    /* ── FAQ ── */
+    .faq-section { background: var(--black); padding: 6rem 5vw; border-top: 1px solid var(--border); }
+    .faq-inner { max-width: 760px; margin: 0 auto; }
+    .faq-list { margin-top: 2.5rem; }
+    .faq-item { border-bottom: 1px solid var(--border); }
+    .faq-question {
+      width: 100%; background: none; border: none; text-align: left;
+      padding: 1.4rem 0; font-family: var(--body); font-size: 1rem;
+      font-weight: 600; color: var(--white); cursor: pointer;
+      display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+    }
+    .faq-question::after { content: '+'; font-size: 1.3rem; color: var(--lime); flex-shrink: 0; transition: transform 0.25s; }
+    .faq-item.open .faq-question::after { transform: rotate(45deg); }
+    .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+    .faq-item.open .faq-answer { max-height: 300px; }
+    .faq-answer-inner { padding-bottom: 1.4rem; font-family: var(--body); font-size: 0.92rem; color: var(--gray-lt); line-height: 1.75; }
+    html.light .faq-question { color: var(--black); }
+
     /* ── CTA ── */
     .cta-section {
       background: var(--black);
@@ -1271,12 +1289,12 @@
     <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
     <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
   </button>
-  <a href="spa-orcamento.html" class="nav-cta">Solicitar orçamento</a>
+  <a href="spa-orcamento.html" class="nav-cta">Solicitar cotação</a>
 </nav>
 
 <!-- LOGO INTRO -->
 <div id="inicio" class="logo-intro">
-  <h1 class="sr-only">SPA Viagens — Agência de Viagens e Concierge em Curitiba</h1>
+  <h1 class="sr-only">SPA Viagens: Agência de Viagens e Concierge em Curitiba</h1>
   <div class="li-bg"></div>
   <div class="li-overlay"></div>
 
@@ -1291,7 +1309,7 @@
       <p class="li-phrase">A única preocupação é <em>chegar no horário</em> ao aeroporto.</p>
     </div>
     <div id="liActions">
-      <a href="spa-orcamento.html" class="btn-primary">Solicitar orçamento</a>
+      <a href="spa-orcamento.html" class="btn-primary">Solicitar cotação</a>
       <a href="#contato" class="btn-ghost">Entrar em contato</a>
     </div>
   </div>
@@ -1304,7 +1322,7 @@
 
 <!-- PROMISE STRIP -->
 <div class="promise-strip">
-  <p>"Transformando sonhos em realizações — do orçamento ao retorno para casa."</p>
+  <p>"Mais que agência: um concierge que acompanha a viagem inteira enquanto você desfruta do seu merecimento."</p>
   <a href="spa-orcamento.html">Quero viajar assim</a>
 </div>
 
@@ -1319,12 +1337,12 @@
       <div class="pillar-card">
         <div class="pillar-num">01</div>
         <h3 class="pillar-title">Concierge Completo</h3>
-        <p class="pillar-desc">Acompanhamos cada etapa da sua jornada — da primeira pesquisa ao check-in de volta — com atenção personalizada e dedicação total ao seu conforto.</p>
+        <p class="pillar-desc">Acompanhamos cada etapa da sua jornada: da primeira pesquisa ao check-in de volta, com atenção personalizada e dedicação total ao seu conforto.</p>
       </div>
       <div class="pillar-card">
         <div class="pillar-num">02</div>
         <h3 class="pillar-title">Expertise em Milhas</h3>
-        <p class="pillar-desc">Identificamos oportunidades que o viajante comum não enxerga. Frequentemente entregamos mais conforto pelo mesmo valor — ou até menos do que fazer sozinho.</p>
+        <p class="pillar-desc">Identificamos oportunidades que o viajante comum não enxerga. Frequentemente entregamos mais conforto pelo mesmo valor, ou até menos do que fazer sozinho.</p>
       </div>
       <div class="pillar-card">
         <div class="pillar-num">03</div>
@@ -1392,7 +1410,7 @@
       <div class="service-card">
         <span class="service-icon">02</span>
         <h3 class="service-name">Passagens Internacionais</h3>
-        <p class="service-desc">Conexões, escalas e tarifas internacionais — incluindo oportunidades exclusivas em milhas.</p>
+        <p class="service-desc">Conexões, escalas e tarifas internacionais, incluindo oportunidades exclusivas em milhas.</p>
       </div>
       <div class="service-card">
         <span class="service-icon">03</span>
@@ -1471,7 +1489,7 @@
       <p class="label">Diferencial exclusivo</p>
       <h2 class="section-title dark">Especialistas em<br><span style="font-style:italic;text-decoration:underline;text-decoration-color:#000;text-underline-offset:6px;">milhas aéreas</span></h2>
       <p class="section-lead dark">Como somos especialistas em milhas, frequentemente encontramos oportunidades que o cliente comum não consegue enxergar.</p>
-      <p class="miles-highlight">"Entregamos toda a comodidade de um serviço concierge pagando o mesmo valor — ou até menos — do que organizar tudo sozinho."</p>
+      <p class="miles-highlight">"Entregamos toda a comodidade de um serviço concierge pagando o mesmo valor, ou até menos, do que organizar tudo sozinho."</p>
     </div>
     <div class="miles-visual">
       <div class="miles-big">Milhas</div>
@@ -1727,7 +1745,7 @@
     <div class="roteiro-intro">
       <p class="label">Incluído no seu pacote</p>
       <h2 class="section-title">Sua viagem planejada<br><span class="accent">dia a dia</span></h2>
-      <p class="section-lead">Após fechar seu pacote, fazemos uma reunião exclusiva para montar o seu roteiro juntos. Você recebe um painel digital com cada voo, hotel, passeio, horário e dica — pra levar no bolso e acompanhar de onde estiver.</p>
+      <p class="section-lead">Após fechar seu pacote, fazemos uma reunião exclusiva para montar o seu roteiro juntos. Você recebe um painel digital com cada voo, hotel, passeio, horário e dica para levar no bolso e acompanhar de onde estiver.</p>
     </div>
 
     <div class="roteiro-features">
@@ -1736,7 +1754,7 @@
       <div class="roteiro-feat"><span class="feat-icon">🗺️</span><span>Passeios com horário reservado e orientações</span></div>
       <div class="roteiro-feat"><span class="feat-icon">💡</span><span>Dicas do concierge para cada momento da viagem</span></div>
       <div class="roteiro-feat"><span class="feat-icon">🚄</span><span>Transferes e conexões detalhadas entre cidades</span></div>
-      <div class="roteiro-feat"><span class="feat-icon">📱</span><span>Acesso pelo celular — o concierge no seu bolso</span></div>
+      <div class="roteiro-feat"><span class="feat-icon">📱</span><span>Acesso pelo celular: o concierge no seu bolso</span></div>
     </div>
 
     <div class="roteiro-case">
@@ -1744,7 +1762,33 @@
       <p class="roteiro-case-trip">Eurotrip do Jonas &amp; Aline</p>
       <p class="roteiro-case-route">Paris · Milão · Veneza · Florença · Pisa · Roma · Nápoles</p>
       <p class="roteiro-case-meta">14 dias · 7 cidades · agosto de 2026</p>
-      <p class="roteiro-case-desc">Do cruzeiro noturno pelo Rio Sena ao Bernina Express pelos Alpes Suíços, cada detalhe foi planejado na reunião de roteiro e documentado no painel exclusivo deles — com horários de embarque, endereços de hotel, alertas de antecedência e as dicas do concierge para cada dia. Tudo no celular, desde a saída de Curitiba até o último voo de volta.</p>
+      <p class="roteiro-case-desc">Do cruzeiro noturno pelo Rio Sena ao Bernina Express pelos Alpes Suíços, cada detalhe foi planejado na reunião de roteiro e documentado no painel exclusivo deles, com horários de embarque, endereços de hotel, alertas de antecedência e as dicas do concierge para cada dia. Tudo no celular, desde a saída de Curitiba até o último voo de volta.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq-section" id="faq">
+  <div class="faq-inner">
+    <p class="label">Dúvidas frequentes</p>
+    <h2 class="section-title">Perguntas que <span class="accent">todo mundo faz</span></h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-question">Quem emite a passagem?</button>
+        <div class="faq-answer"><div class="faq-answer-inner">A SPA Viagens cuida de todo o processo: cotação, reserva e emissão. Você só precisa confirmar os dados e embarcar.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">O bilhete fica em nome de quem?</button>
+        <div class="faq-answer"><div class="faq-answer-inner">Sempre no nome do passageiro. O bilhete é emitido diretamente na companhia aérea, com o localizador no seu CPF. A SPA apenas coordena o processo.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">E se eu precisar cancelar?</button>
+        <div class="faq-answer"><div class="faq-answer-inner">A gente te orienta em todo o processo de cancelamento ou remarcação. As regras dependem da tarifa contratada, que explicamos com clareza antes de fechar.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">É seguro comprar passagens com milhas?</button>
+        <div class="faq-answer"><div class="faq-answer-inner">Sim. O bilhete é emitido direto no sistema da companhia aérea, no seu nome, com localizador real. Você pode checar tudo no site da cia antes de embarcar. Trabalhamos com milhas de origem verificada, dentro das regras dos programas.</div></div>
+      </div>
     </div>
   </div>
 </section>
@@ -1752,7 +1796,7 @@
 <!-- CTA -->
 <section class="cta-section" id="contato">
   <p class="label" style="justify-content:center;">Pronto para viajar?</p>
-  <h2 class="section-title">Solicite seu orçamento<br><span class="accent">sem compromisso</span></h2>
+  <h2 class="section-title">Solicite a sua cotação<br><span class="accent">sem compromisso</span></h2>
   <p class="section-lead">Conta seu destino, as datas e o que precisa. Em poucas horas você recebe uma proposta personalizada, cuidada em cada detalhe.</p>
   <div class="cta-buttons">
     <a href="spa-orcamento.html" class="btn-wa">
@@ -1976,6 +2020,14 @@
       track.addEventListener('mouseenter', () => tween.pause());
       track.addEventListener('mouseleave', () => tween.resume());
     })();
+  </script>
+
+  <script>
+    document.querySelectorAll('.faq-question').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        btn.closest('.faq-item').classList.toggle('open');
+      });
+    });
   </script>
 
   <script>

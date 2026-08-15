@@ -1,0 +1,12 @@
+# Credenciais e segredos
+.env
+cotar-confirmar.php
+
+# macOS
+.DS_Store
+
+# Claude Code
+.claude/
+
+# Docs internos
+docs/

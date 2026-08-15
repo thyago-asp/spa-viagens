@@ -3,7 +3,50 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SPA Viagens – Solicitar Orçamento</title>
+  <title>Solicitar Orçamento de Viagem | SPA Viagens</title>
+  <meta name="description" content="Solicite seu orçamento de viagem personalizado com a SPA Viagens. Preencha o formulário e nossa equipe entra em contato com a melhor proposta para o seu destino." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://spaviagens.com.br/spa-orcamento.html" />
+
+  <!-- Open Graph -->
+  <meta property="og:type"        content="website" />
+  <meta property="og:locale"      content="pt_BR" />
+  <meta property="og:site_name"   content="SPA Viagens" />
+  <meta property="og:url"         content="https://spaviagens.com.br/spa-orcamento.html" />
+  <meta property="og:title"       content="Solicitar Orçamento de Viagem | SPA Viagens" />
+  <meta property="og:description" content="Preencha o formulário e receba a melhor proposta de viagem personalizada. Concierge completo, milhas aéreas e atendimento humanizado." />
+  <meta property="og:image"       content="https://spaviagens.com.br/img/logospa.png" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card"        content="summary_large_image" />
+  <meta name="twitter:title"       content="Solicitar Orçamento de Viagem | SPA Viagens" />
+  <meta name="twitter:description" content="Preencha o formulário e receba a melhor proposta de viagem personalizada pela SPA Viagens." />
+  <meta name="twitter:image"       content="https://spaviagens.com.br/img/logospa.png" />
+
+  <!-- Schema.org JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Solicitar Orçamento de Viagem",
+    "description": "Formulário para solicitar orçamento de viagem personalizado com a SPA Viagens.",
+    "url": "https://spaviagens.com.br/spa-orcamento.html",
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "SPA Viagens",
+      "url": "https://spaviagens.com.br"
+    },
+    "breadcrumb": {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Início", "item": "https://spaviagens.com.br/spa-viagens.html"},
+        {"@type": "ListItem", "position": 2, "name": "Solicitar Orçamento", "item": "https://spaviagens.com.br/spa-orcamento.html"}
+      ]
+    }
+  }
+  </script>
+
+  <link rel="icon" type="image/png" href="img/icone-spa.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;1,400&display=swap" rel="stylesheet"/>
@@ -23,6 +66,18 @@
       --red:    #ff4d4d;
       --display:'Playfair Display', Georgia, serif;
       --body:   'Montserrat', system-ui, sans-serif;
+    }
+    html.light {
+      --black:  #f7f7f5;
+      --black2: #eeeeeb;
+      --black3: #e5e5e0;
+      --lime:   #7aaa00;
+      --lime-dk:#5f8800;
+      --white:  #111111;
+      --gray:   #555555;
+      --gray-lt:#222222;
+      --border: rgba(0,0,0,0.12);
+      --border-focus: rgba(100,140,0,0.6);
     }
     html { scroll-behavior: smooth; }
     body {
@@ -45,7 +100,7 @@
       border-bottom: 1px solid var(--border);
       backdrop-filter: blur(10px);
     }
-    header img { height: 65px; width: auto; }
+    header img { height: 38px; width: auto; }
     .header-back {
       display: inline-flex; align-items: center; gap: 0.5rem;
       font-size: 0.72rem; font-weight: 500; letter-spacing: 0.14em;
@@ -227,8 +282,18 @@
       transition: background 0.2s, transform 0.15s;
     }
     .btn-next:hover { background: var(--lime-dk); transform: translateY(-1px); }
+    .btn-next:disabled {
+      opacity: 0.55; cursor: not-allowed; transform: none;
+      pointer-events: none;
+    }
     .btn-submit {
       background: var(--lime); color: var(--black);
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner {
+      width: 14px; height: 14px; border: 2px solid rgba(0,0,0,0.25);
+      border-top-color: var(--black); border-radius: 50%;
+      animation: spin 0.7s linear infinite; flex-shrink: 0;
     }
 
     /* ── SUCCESS ── */
@@ -336,11 +401,12 @@
       *, *::before, *::after { animation: none !important; transition: none !important; }
     }
   </style>
+  <script>if(localStorage.getItem('theme')==='light')document.documentElement.classList.add('light');</script>
 </head>
 <body>
 
 <header>
-  <img src="img/logospa.png" alt="SPA Viagens"/>
+  <img src="img/icone-spa.png" alt="SPA Viagens" style="height:40px;width:auto;display:block;">
   <a href="spa-viagens.html" class="header-back">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
     Voltar ao site
@@ -376,8 +442,8 @@
 
       <div class="field-group">
         <label>Telefone / WhatsApp <span class="req">*</span></label>
-        <input type="tel" id="campoCelular" placeholder="+55 11 99988-7766"/>
-        <div class="field-error" id="err-celular">Informe um telefone válido (+PAIS DDD NUMERO)</div>
+        <input type="tel" id="campoCelular" placeholder="(41) 99999-0000"/>
+        <div class="field-error" id="err-celular">Informe um celular com DDD, ex: (41) 99999-0000</div>
       </div>
 
       <div class="field-group">
@@ -571,7 +637,7 @@
       <h2>Solicitação enviada!</h2>
       <p>Nossa equipe vai analisar seu pedido e entrar em contato em breve com a melhor proposta para você.</p>
       <div style="margin-top:2.5rem;">
-        <a href="https://wa.me/5500000000000" class="btn-next" style="display:inline-flex;text-decoration:none;">
+        <a href="https://wa.me/5541999902022" class="btn-next" style="display:inline-flex;text-decoration:none;">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
           Falar no WhatsApp
         </a>
@@ -671,7 +737,7 @@
 
     <div class="summary-cta">
       <p>Prefere falar diretamente? Nossa equipe está pronta para atender.</p>
-      <a href="https://wa.me/5500000000000" target="_blank" class="summary-wa">
+      <a href="https://wa.me/5541999902022" target="_blank" class="summary-wa">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
         Falar pelo WhatsApp
       </a>
@@ -736,8 +802,12 @@
   function reqPhone(id, errId) {
     const el = document.getElementById(id);
     const err = document.getElementById(errId);
-    const v = el.value.trim();
+    let v = el.value.trim().replace(/[\s\-().]/g, '');
     if (!v) { el.classList.add('error'); err.classList.add('show'); return false; }
+    if (!v.startsWith('+')) v = '+55' + v;
+    const digits = v.replace(/\D/g, '');
+    if (digits.length < 10) { el.classList.add('error'); err.classList.add('show'); return false; }
+    el.value = v;
     el.classList.remove('error'); err.classList.remove('show'); return true;
   }
 
@@ -842,16 +912,23 @@
   }
 
   // ── SUBMIT ──
+  let _submitting = false;
   async function submitForm() {
+    if (_submitting) return;
     if (!validateStep(5)) return;
 
+    _submitting = true;
     const btnSubmit = document.querySelector('.btn-submit');
     btnSubmit.disabled = true;
-    btnSubmit.innerHTML = 'Enviando... <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>';
+    btnSubmit.innerHTML = 'Enviando... <span class="spinner"></span>';
 
     const payload = {
       campoNome:              document.getElementById('campoNome').value.trim(),
-      campoCelular:           document.getElementById('campoCelular').value.trim(),
+      campoCelular:           (() => {
+        let v = document.getElementById('campoCelular').value.trim().replace(/[\s\-().]/g, '');
+        if (!v.startsWith('+')) v = '+55' + v;
+        return v;
+      })(),
       campoEmail:             document.getElementById('campoEmail').value.trim(),
       campoOrigem:            document.getElementById('campoOrigem').value.trim(),
       campoDestino:           document.getElementById('campoDestino').value.trim(),
@@ -869,11 +946,9 @@
     };
 
     try {
-      const response = await fetch('/api/orcamento', {
+      const response = await fetch('/proxy.php', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
 
@@ -888,11 +963,13 @@
       } else {
         // Erro retornado pela API
         showApiError(result.msg || 'Erro ao realizar a solicitação. Tente novamente.');
+        _submitting = false;
         btnSubmit.disabled = false;
         btnSubmit.innerHTML = 'Enviar solicitação <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
       }
     } catch (err) {
       showApiError('Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.');
+      _submitting = false;
       btnSubmit.disabled = false;
       btnSubmit.innerHTML = 'Enviar solicitação <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
     }

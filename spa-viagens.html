@@ -867,6 +867,78 @@
     .depo-author span { display: block; font-family: var(--body); font-size: 0.7rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--lime); margin-top: 0.2rem; }
     @media (max-width: 700px) { .depo-grid { grid-template-columns: 1fr; } }
 
+    /* ── ROTEIRO CONCIERGE ── */
+    .roteiro-section { background: var(--black3); padding: 6rem 5vw; }
+    .roteiro-inner { max-width: 900px; margin: 0 auto; }
+    .roteiro-intro { max-width: 640px; }
+    .roteiro-features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 0.85rem;
+      margin: 2.5rem 0;
+    }
+    .roteiro-feat {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 1.1rem 1.4rem;
+      background: var(--black);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-family: var(--body);
+      font-size: 0.88rem;
+      color: var(--gray-lt);
+      line-height: 1.55;
+    }
+    .feat-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 0.1rem; }
+    .roteiro-case {
+      background: var(--black);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--lime);
+      border-radius: 4px;
+      padding: 2rem 2.5rem;
+    }
+    .roteiro-case-tag {
+      font-family: var(--body);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      color: var(--lime);
+      margin-bottom: 0.65rem;
+    }
+    .roteiro-case-trip {
+      font-family: var(--display);
+      font-size: 1.45rem;
+      font-weight: 600;
+      color: var(--white);
+      margin: 0 0 0.3rem;
+    }
+    .roteiro-case-route {
+      font-family: var(--body);
+      font-size: 0.85rem;
+      color: var(--gray-lt);
+      letter-spacing: 0.02em;
+      margin: 0 0 0.2rem;
+    }
+    .roteiro-case-meta {
+      font-family: var(--body);
+      font-size: 0.78rem;
+      color: var(--gray);
+      margin: 0 0 1.25rem;
+    }
+    .roteiro-case-desc {
+      font-family: var(--body);
+      font-size: 0.95rem;
+      color: var(--gray-lt);
+      line-height: 1.8;
+      margin: 0;
+    }
+    @media (max-width: 600px) {
+      .roteiro-features { grid-template-columns: 1fr; }
+      .roteiro-case { padding: 1.5rem; }
+    }
+
     /* ── CTA ── */
     .cta-section {
       background: var(--black);
@@ -1647,6 +1719,34 @@
         </div>
       </div>
 
+    </div>
+  </div>
+</section>
+
+<!-- ROTEIRO CONCIERGE -->
+<section class="roteiro-section" id="roteiro">
+  <div class="roteiro-inner">
+    <div class="roteiro-intro">
+      <p class="label">Incluído no seu pacote</p>
+      <h2 class="section-title">Sua viagem planejada<br><span class="accent">dia a dia</span></h2>
+      <p class="section-lead">Após fechar seu pacote, fazemos uma reunião exclusiva para montar o seu roteiro juntos. Você recebe um painel digital com cada voo, hotel, passeio, horário e dica — pra levar no bolso e acompanhar de onde estiver.</p>
+    </div>
+
+    <div class="roteiro-features">
+      <div class="roteiro-feat"><span class="feat-icon">✈️</span><span>Voos com horários, companhia e detalhes de bagagem</span></div>
+      <div class="roteiro-feat"><span class="feat-icon">🏨</span><span>Hotéis com endereço e instruções de check-in</span></div>
+      <div class="roteiro-feat"><span class="feat-icon">🗺️</span><span>Passeios com horário reservado e orientações</span></div>
+      <div class="roteiro-feat"><span class="feat-icon">💡</span><span>Dicas do concierge para cada momento da viagem</span></div>
+      <div class="roteiro-feat"><span class="feat-icon">🚄</span><span>Transferes e conexões detalhadas entre cidades</span></div>
+      <div class="roteiro-feat"><span class="feat-icon">📱</span><span>Acesso pelo celular — o concierge no seu bolso</span></div>
+    </div>
+
+    <div class="roteiro-case">
+      <div class="roteiro-case-tag">Exemplo real</div>
+      <p class="roteiro-case-trip">Eurotrip do Jonas &amp; Aline</p>
+      <p class="roteiro-case-route">Paris · Milão · Veneza · Florença · Pisa · Roma · Nápoles</p>
+      <p class="roteiro-case-meta">14 dias · 7 cidades · agosto de 2026</p>
+      <p class="roteiro-case-desc">Do cruzeiro noturno pelo Rio Sena ao Bernina Express pelos Alpes Suíços, cada detalhe foi planejado na reunião de roteiro e documentado no painel exclusivo deles — com horários de embarque, endereços de hotel, alertas de antecedência e as dicas do concierge para cada dia. Tudo no celular, desde a saída de Curitiba até o último voo de volta.</p>
     </div>
   </div>
 </section>

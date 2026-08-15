@@ -104,26 +104,34 @@
       --black:   #f7f7f5;
       --black2:  #eeeeeb;
       --black3:  #e5e5e0;
-      --lime:    #7aaa00;
-      --lime-dk: #5f8800;
+      --lime:    #4d7200;
+      --lime-dk: #3a5500;
       --white:   #111111;
       --gray:    #555555;
       --gray-lt: #222222;
-      --border:  rgba(100,140,0,0.2);
+      --border:  rgba(60,100,0,0.18);
     }
     /* Nav sempre sobre fundo escuro — links ficam brancos */
-    html.light .nav-link { color: rgba(255,255,255,0.6); }
-    html.light .nav-link:hover { color: #CBFF00; }
+    html.light .nav-link        { color: rgba(255,255,255,0.75); }
+    html.light .nav-link:hover  { color: #CBFF00; }
+    html.light .nav-cta         { background: #4d7200; color: #ffffff; }
+    html.light .nav-cta:hover   { background: #3a5500; }
 
-    /* Hero sempre escuro */
+    /* Logo-intro e Hero — fundo sempre escuro, texto sempre claro */
+    html.light .logo-intro .btn-ghost,
+    html.light .hero .btn-ghost {
+      color: #ffffff;
+      border-color: rgba(255,255,255,0.45);
+    }
     html.light .hero .hero-eyebrow        { color: #CBFF00; }
     html.light .hero .hero-eyebrow::before{ background: #CBFF00; }
     html.light .hero .hero-slogan         { color: #CBFF00; border-color: rgba(203,255,0,0.3); }
     html.light .hero .hero-title          { color: #ffffff; }
     html.light .hero .hero-sub            { color: rgba(255,255,255,0.65); }
-    html.light .hero .btn-ghost           { color: #ffffff; border-color: rgba(255,255,255,0.25); }
     html.light .hero .stat-label          { color: rgba(255,255,255,0.4); }
     html.light .hero .stat-value          { color: #CBFF00; }
+
+    /* Seções claras */
     html.light .stat-label     { color: rgba(17,17,17,0.55); }
     html.light .section-lead   { color: rgba(17,17,17,0.65); }
     html.light .miles-caption  { color: rgba(17,17,17,0.6); }
@@ -131,6 +139,12 @@
     html.light .depo-text      { color: rgba(17,17,17,0.75); }
     html.light .footer-tagline { color: rgba(17,17,17,0.45); }
     html.light .review-text    { color: rgba(17,17,17,0.85); }
+    html.light .label          { color: #4d7200; }
+    html.light .pillar-num     { color: rgba(77,114,0,0.35); }
+    html.light .promise-strip  { background: #4d7200; }
+    html.light .promise-strip p,
+    html.light .promise-strip a { color: #ffffff; }
+    html.light .promise-strip a:hover { color: #CBFF00; }
 
     html { scroll-behavior: smooth; }
 
@@ -1869,7 +1883,7 @@
   <script>
     (function() {
       const btn = document.getElementById('themeToggle');
-      if (localStorage.getItem('theme') === 'light') {
+      if (localStorage.getItem('theme') !== 'dark') {
         document.documentElement.classList.add('light');
       }
       btn.addEventListener('click', () => {
